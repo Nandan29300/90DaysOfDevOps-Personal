@@ -256,8 +256,10 @@ Command:
 
 - Can be stopped with **Ctrl+Z** and resumed with **fg**
 
+## 11) Operating System Architecture:
+<img width="533" height="564" alt="image" src="https://github.com/user-attachments/assets/1657b915-12b3-4399-9817-addfe2cb93c2" />
 
-## 11) Quick Summary Table:
+## 12) Quick Summary Table:
 
 | Term               | Meaning (Simple)                   | Example / Command              |
 | ------------------ | ---------------------------------- | ------------------------------ |

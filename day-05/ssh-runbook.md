@@ -173,6 +173,14 @@ rtt min/avg/max/mdev = 0.082/0.128/0.219/0.064 ms
 
 ---
 
+### `ssh localhost`
+
+### Observation:
+
+> SSH login prompt appeared successfully indicating connectivity is working.
+
+---
+
 ## 6. Logs Reviewed
 
 ### `journalctl -u ssh -n 50`

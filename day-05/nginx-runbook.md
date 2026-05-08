@@ -1,6 +1,7 @@
 # 🌐 Nginx Web Server – Linux Troubleshooting Runbook
 
 **Date:** 07-05-2026
+
 **Target Service:** `nginx` (Nginx HTTP Server)
 
 ---
@@ -68,7 +69,7 @@ Command Output:
 
 ```
     PID %CPU %MEM COMMAND
-   1456  0.0  0.3 nginx
+   1456  0.0  0.3  nginx
 ```
 
 > **Note:** Nginx master process is essentially idle (0.0% CPU, 0.3% memory). The master only manages worker processes - workers handle actual requests.
@@ -76,127 +77,180 @@ Command Output:
 ---
 
 ### Check all Nginx worker processes
-```bash
-ps aux | grep nginx
-```
-```
-www-data  1457  0.1  0.4  55320  8120 ?  S   08:41   0:02 nginx: worker process
-www-data  1458  0.1  0.4  55320  8044 ?  S   08:41   0:02 nginx: worker process
-root      1456  0.0  0.3  55064  6592 ?  Ss  08:41   0:00 nginx: master process
-```
-> **Note:** 2 worker processes running as `www-data` (correct, non-root). Master process runs as root to bind to port 80/443. Healthy process hierarchy.
 
+```bash
+:~$ ps aux | grep nginx
+```
+Command Output:
+
+```
+root       817  0.0  0.0  55240  2316 ?  Ss  12:36   0:00 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+www-data   818  0.0  0.0  55876  5668 ?  S   12:36   0:00 nginx: worker process
+www-data   819  0.0  0.0  55876  5668 ?  S   12:36   0:00 nginx: worker process
+www-data   820  0.0  0.0  55876  5668 ?  S   12:36   0:00 nginx: worker process
+www-data   821  0.0  0.0  55876  5668 ?  S   12:36   0:00 nginx: worker process
+```
+
+> **Note:** Master process (PID 817) running as root to bind ports 80/443 - correct. 12 worker processes running as `www-data` (non-root) - healthy and secure. Higher worker count than default, likely matching CPU core count on this laptop.
+
+> Port 22 → SSH, 
+> Port 80 → Nginx (HTTP), 
+> Port 443 → Nginx (HTTPS)
+> 
 ---
 
 ### `free -h`
+
+Command Output:
+
 ```
                total        used        free      shared  buff/cache   available
-Mem:           3.8Gi       1.3Gi       1.1Gi        72Mi       1.4Gi       2.2Gi
-Swap:          2.0Gi          0B       2.0Gi
+Mem:           7.4Gi       1.7Gi       2.5Gi       455Mi     3.2Gi      5.0Gi
+Swap:          2.0Gi         0B        2.0Gi
 ```
-> **Note:** Swap is unused. 2.2 GiB available. Nginx is not memory-pressured. If traffic spikes, buffer cache will absorb most of it.
+
+> **Note:** Swap is completely unused - system is not memory-pressured. ~5.0 GiB available memory. SSH is not contributing to memory stress.
 
 ---
 
 ## 4. Snapshot: Disk & IO
 
 ### `df -h`
+
+Command Output:
+
 ```
 Filesystem      Size  Used Avail Use% Mounted on
-/dev/sda1        20G   8.4G   11G  45% /
-tmpfs           1.9G     0B  1.9G   0% /dev/shm
-/dev/sda15      105M  6.1M   99M   6% /boot/efi
+tmpfs           758M  2.8M  755M   1% /run
+/dev/nvme0n1p6   96G   58G   34G  64% /
+tmpfs           3.7G   38M  3.7G   1% /dev/shm
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+efivarfs        256K  149K  103K  60% /sys/firmware/efi/efivars
+/dev/nvme0n1p1  256M   99M  158M  39% /boot/efi
+tmpfs           758M  116K  758M   1% /run/user/1000
 ```
-> **Note:** Root filesystem at 45% — healthy. Nginx logs and web content live under `/var` and `/var/www` respectively, both on root partition.
+
+> **Note:** Root filesystem (`/dev/nvme0n1p6`) is at 64% of 96GB - healthy but worth monitoring. NVMe drive confirms this is an SSD-based laptop. `/boot/efi` at 39% is fine. No volumes near full that could block SSH log writes.
 
 ---
 
 ### `du -sh /var/log/nginx`
+
+Command Output:
+
 ```
-156M    /var/log/nginx
+8.0K    /var/log/nginx
 ```
-> **Note:** ⚠️ Nginx logs are at 156 MB. Not critical yet, but `access.log` grows fast under traffic. Confirm `logrotate` is configured for `/var/log/nginx/*.log`.
+
+> **Note:** ✅ Nginx logs are only 8KB - extremely small. This is a fresh install with minimal traffic. As traffic grows, `access.log` will grow fast. Confirm `logrotate` is configured for `/var/log/nginx/*.log` to avoid log bloat in production.
 
 ---
 
 ### `iostat -x 1 3`
+
+Command Output:
+
 ```
-Device    r/s    w/s    rkB/s    wkB/s   util%
-sda       1.2    4.8     14.4     38.4    2.1%
+avg-cpu:  %user   %nice  %system  %iowait  %steal   %idle
+           1.48    0.10     0.74     0.11    0.00   97.57
+
+Device       r/s     rkB/s    w/s    wkB/s   %util
+nvme0n1    59.77   2440.85  19.73  1099.65    1.20
 ```
-> **Note:** Disk utilization at 2.1% — very low. Nginx is writing logs at ~38 KB/s (steady traffic). No I/O bottleneck present.
+
+> **Note:** ✅ Only real disk is `nvme0n1` (NVMe SSD) - all `loop` devices are snap packages, safely ignored. NVMe utilization at just 1.2% - no I/O bottleneck. CPU idle at 97.57%. Nginx is not causing any disk pressure. Samples 2 and 3 show zero activity - system settled completely.
 
 ---
 
 ## 5. Snapshot: Network
 
 ### `ss -tulpn | grep nginx`
+
+Command Output:
+
 ```
-tcp   LISTEN 0   511   0.0.0.0:80    0.0.0.0:*   users:(("nginx",pid=1457,fd=6))
-tcp   LISTEN 0   511   0.0.0.0:443   0.0.0.0:*   users:(("nginx",pid=1457,fd=7))
-tcp   LISTEN 0   511      [::]:80       [::]:*   users:(("nginx",pid=1457,fd=8))
-tcp   LISTEN 0   511      [::]:443      [::]:*   users:(("nginx",pid=1457,fd=9))
+tcp  LISTEN 0  511   0.0.0.0:80   0.0.0.0:*   users:(("nginx",pid=817,fd=6),...(12 workers))
+tcp  LISTEN 0  511      [::]:80      [::]:*   users:(("nginx",pid=817,fd=7),...(12 workers))
 ```
-> **Note:** Nginx correctly listening on ports 80 and 443 for both IPv4 and IPv6. Backlog is 511 (default). No unexpected ports.
+
+> **Note:** ✅ Nginx listening on port 80 for both IPv4 and IPv6. Backlog is 511 (default). All 12 worker processes + master (PID 817) are bound to port 80. No HTTPS (443) configured yet - this is a fresh local install. No unexpected ports open.
 
 ---
 
 ### `curl -I http://localhost`
+
+Command Output:
+
 ```
 HTTP/1.1 200 OK
-Server: nginx/1.24.0 (Ubuntu)
-Date: Wed, 07 May 2026 10:05:33 GMT
+Server: nginx/1.18.0 (Ubuntu)
+Date: Fri, 08 May 2026 07:26:29 GMT
 Content-Type: text/html
-Content-Length: 4286
+Content-Length: 612
+Last-Modified: Thu, 07 May 2026 18:51:50 GMT
 Connection: keep-alive
-X-Cache: HIT
+ETag: "69fcdf46-264"
+Accept-Ranges: bytes
 ```
-> **Note:** HTTP 200 OK — Nginx is serving requests successfully. `X-Cache: HIT` means the caching layer is working. Response time was <5ms locally.
+
+> **Note:** ✅ HTTP 200 OK - Nginx is serving requests successfully. Running version 1.18.0 on Ubuntu. No `X-Cache` header means no caching layer configured yet - serving static files directly. Response size is 612 bytes (default Nginx welcome page).
 
 ---
 
 ### `curl -I https://localhost -k`
+
+Command Output:
+
 ```
-HTTP/2 200
-server: nginx/1.24.0 (Ubuntu)
-content-type: text/html
-strict-transport-security: max-age=31536000; includeSubDomains
+curl: (7) Failed to connect to localhost port 443 after 0 ms: Connection refused
 ```
-> **Note:** HTTPS is also working. HTTP/2 active. HSTS header present — good security posture. `-k` flag used to skip self-signed cert validation in local test.
+
+> **Note:** ⚠️ HTTPS (port 443) is not configured on this fresh Nginx install. SSL certificate and HTTPS server block have not been set up yet. This is expected for a local learning environment. In production, HTTPS should be configured using Let's Encrypt (`certbot`) or a self-signed certificate.
 
 ---
 
 ## 6. Logs Reviewed
 
 ### `journalctl -u nginx -n 50`
+
+Command Output:
+
 ```
-May 07 08:41:00 devbox nginx[1456]: nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-May 07 08:41:00 devbox nginx[1456]: nginx: configuration file /etc/nginx/nginx.conf test is successful
-May 07 08:41:00 devbox systemd[1]: Started A high performance web server and a reverse proxy server.
-May 07 09:48:12 devbox nginx[1456]: 2026/05/07 09:48:12 [warn] 1458#1458: *1042 upstream response is buffered to a temporary file /var/lib/nginx/tmp/proxy/1/00/0000000001
-May 07 09:55:44 devbox nginx[1456]: 2026/05/07 09:55:44 [error] 1457#1457: *1098 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.1.5
+May 08 00:21:51 nandan-Victus systemd[1]: Starting A high performance web server and a reverse proxy server...
+May 08 00:21:51 nandan-Victus systemd[1]: Started A high performance web server and a reverse proxy server.
+May 08 00:41:44 nandan-Victus systemd[1]: Stopping A high performance web server and a reverse proxy server...
+May 08 00:41:44 nandan-Victus systemd[1]: nginx.service: Deactivated successfully.
+May 08 00:41:44 nandan-Victus systemd[1]: Stopped A high performance web server and a reverse proxy server.
+-- Boot 8da56119733148af8fca9c1f3399ddb0 --
+May 08 12:36:53 nandan-Victus systemd[1]: Starting A high performance web server and a reverse proxy server...
+May 08 12:36:53 nandan-Victus systemd[1]: Started A high performance web server and a reverse proxy server.
 ```
-> **Note:** ⚠️ Two issues: (1) An upstream response was too large to buffer in memory — proxy buffer size may need tuning. (2) Nginx failed to connect to an upstream (backend app down or misconfigured upstream address).
+
+> **Note:** ✅ Clean logs - no errors or warnings. Nginx started successfully twice today. First start at 00:21, stopped at 00:41 (manual stop during setup), then cleanly restarted at 12:36 on current boot. No upstream failures or config issues detected.
 
 ---
 
 ### `tail -n 50 /var/log/nginx/error.log`
+
+Command Output:
+
 ```
-2026/05/07 09:55:44 [error] 1457#1457: *1098 connect() failed (111: Connection refused) while connecting to upstream, server: _, request: "GET /api/users HTTP/1.1", upstream: "http://127.0.0.1:3000/api/users"
-2026/05/07 09:58:01 [error] 1457#1457: *1102 connect() failed (111: Connection refused) while connecting to upstream, server: _, request: "GET /api/products HTTP/1.1", upstream: "http://127.0.0.1:3000/api/products"
-2026/05/07 10:01:30 [warn]  1458#1458: *1112 upstream sent invalid header while reading response header from upstream
+2026/05/08 00:21:51 [notice] 6990#6990: using inherited sockets from "6;7;"
 ```
-> **Note:** 🔴 The backend service on `127.0.0.1:3000` is not responding — port 3000 is refused. Nginx is returning 502 Bad Gateway to clients for `/api/*` routes. Upstream (Node.js / app server) needs to be restarted.
+
+> **Note:** ✅ Only one `[notice]` level entry in error log - not an actual error. This message means Nginx smoothly inherited socket connections during restart without dropping any. No `[error]` or `[warn]` entries at all. Error log is clean.
 
 ---
 
 ### `tail -n 20 /var/log/nginx/access.log`
+
+Command Output:
+
 ```
-10.0.1.5 - - [07/May/2026:09:55:44 +0000] "GET /api/users HTTP/1.1" 502 559 "-" "Mozilla/5.0"
-10.0.1.8 - - [07/May/2026:09:56:12 +0000] "GET / HTTP/1.1" 200 4286 "-" "curl/7.88.1"
-10.0.1.5 - - [07/May/2026:09:58:01 +0000] "GET /api/products HTTP/1.1" 502 559 "-" "PostmanRuntime/7.32"
+127.0.0.1 - - [08/May/2026:12:56:29 +0530] "HEAD / HTTP/1.1" 200 0 "-" "curl/7.81.0"
 ```
-> **Note:** 502 errors are hitting API routes from real clients. Static content (200 on `/`) is unaffected. Issue is isolated to the upstream backend.
+
+> **Note:** ✅ Only one request in access log - the `curl -I http://localhost` command we ran during this drill. Response was 200 OK. No real external traffic yet since this is a fresh local install. No 502 or 404 errors anywhere.
 
 ---
 
@@ -204,53 +258,63 @@ May 07 09:55:44 devbox nginx[1456]: 2026/05/07 09:55:44 [error] 1457#1457: *1098
 
 | Check | Status | Observation |
 |---|---|---|
-| CPU Usage | ✅ Normal | Master + 2 workers, minimal CPU |
+| CPU Usage | ✅ Normal | Master + 12 workers, 0.0% CPU - idle |
 | Memory | ✅ Normal | No memory pressure, swap unused |
-| Disk | ⚠️ Monitor | Logs at 156 MB — verify logrotate |
-| Ports | ✅ Normal | 80 + 443 bound correctly |
+| Disk | ✅ Normal | Logs at 8KB - fresh install, verify logrotate for future |
+| Ports | ⚠️ Monitor | Port 80 bound correctly, port 443 not configured yet |
 | HTTP Health | ✅ Normal | Static content returning 200 OK |
-| Upstream API | 🔴 Critical | Backend on :3000 is down — 502 errors |
-| Proxy Buffering | ⚠️ Monitor | Some large upstream responses hitting disk |
+| HTTPS | ⚠️ Action Needed | Port 443 refused - SSL not configured yet |
+| Error Log | ✅ Clean | Only one `[notice]` entry - no errors or warnings |
 
 ---
 
 ## 8. If This Worsens — Next Steps
 
 **1. Immediately investigate the upstream backend on port 3000**
+
 ```bash
+
 # Check if backend process is running
-ss -tulpn | grep 3000
-ps aux | grep node          # or pm2, gunicorn, etc.
+:~$ ss -tulpn | grep 3000
+:~$ ps aux | grep node          # or pm2, gunicorn, etc.
 
 # Attempt restart
-sudo systemctl restart myapp   # replace with actual service name
+:~$ sudo systemctl restart myapp   # replace with actual service name
 # or: pm2 restart all
 
 # Verify it's back
-curl -I http://127.0.0.1:3000/api/users
+:~$ curl -I http://127.0.0.1:3000/api/users
+
 ```
 > Until backend recovers, consider returning a custom 502 page in nginx: `error_page 502 /maintenance.html;`
+
 
 **2. Tune proxy buffer size to stop disk-buffering**
 
 Edit `/etc/nginx/nginx.conf` or the relevant `server {}` block:
+
 ```nginx
 proxy_buffer_size          128k;
 proxy_buffers              4 256k;
 proxy_busy_buffers_size    256k;
 ```
-Then: `sudo nginx -t && sudo systemctl reload nginx`
+
+Then: `:~$ sudo nginx -t && sudo systemctl reload nginx`
+
 > This reduces the "buffered to temporary file" warnings and improves proxy throughput.
 
+
 **3. Collect request traces with `strace` on a worker**
+
 ```bash
 # Find a worker PID
-ps aux | grep "nginx: worker"
+:~$ ps aux | grep "nginx: worker"
+
 # Attach strace to it
-sudo strace -p 1457 -e trace=network,read,write -T -o /tmp/nginx-strace.txt
+:~$ sudo strace -p 1457 -e trace=network,read,write -T -o /tmp/nginx-strace.txt
 ```
+
 > Use when Nginx workers are hanging or a specific endpoint is slow. Captures exact syscalls with timing (`-T`) to pinpoint where the worker is blocked.
 
 ---
 
-*Runbook complete. Re-run this drill after any upstream deployment or Nginx config change.*

@@ -268,7 +268,7 @@ Command Output:
 
 ---
 
-## 8. If This Worsens — Next Steps
+## 8. If This Worsens - Next Steps
 
 **1. Immediately investigate the upstream backend on port 3000**
 

@@ -361,6 +361,6 @@ sudo groupdel developers
 * The first tokyo is the username you passed to the groups command.
 * The second tokyo is the primary group - in Linux, when you create a user with useradd, it automatically creates a group with the same name as the user. That's tokyo's personal default group.
 * Then developers is the **supplementary group** I manually added.
---- So the format is always: ---
+* So the format is always:
 <username> : <primary group> <supplementary groups...>
 ---

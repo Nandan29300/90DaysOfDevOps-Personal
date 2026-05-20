@@ -344,5 +344,3 @@ ls -l /opt/team-workspace/
 3. **Group-based access control scales well in real DevOps environments** - instead of editing file permissions every time a teammate joins or leaves a project, you simply add or remove them from a group. The shared directories stay unchanged. This is the foundation of how tools like sudo rules, CI/CD system access, and cloud IAM roles work.
 
 ---
-
-*Day 09 of #90DaysOfDevOps | #DevOpsKaJosh | #TrainWithShubham*

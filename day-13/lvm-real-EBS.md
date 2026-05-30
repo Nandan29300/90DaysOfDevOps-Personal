@@ -144,14 +144,14 @@ pvs
 **Sample Output:**
 
 ```
-Physical volume "/dev/sdb" successfully created.
-Physical volume "/dev/sdc" successfully created.
-Physical volume "/dev/sdd" successfully created.
+Physical volume "/dev/xvdf" successfully created.
+Physical volume "/dev/xvdg" successfully created.
+Physical volume "/dev/xvdh" successfully created.
 
-PV         VG   Fmt  Attr PSize   PFree
-/dev/sdb        lvm2 ---  10.00g  10.00g
-/dev/sdc        lvm2 ---  12.00g  12.00g
-/dev/sdd        lvm2 ---  14.00g  14.00g
+PV         VG Fmt  Attr PSize  PFree
+/dev/xvdf     lvm2 ---  10.00g 10.00g
+/dev/xvdg     lvm2 ---  12.00g 12.00g
+/dev/xvdh     lvm2 ---  14.00g 14.00g
 ```
 
 > 📸 _[Screenshot: pvcreate and pvs output]_

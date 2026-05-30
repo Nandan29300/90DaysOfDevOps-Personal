@@ -67,6 +67,25 @@ xvdh     202:112  0   14G  0 disk
 
 ---
 
+```
+Real Disks (EBS)
+  xvdf (10G) + xvdg (12G) + xvdh (14G)
+       ↓
+  Make each disk a PV (Physical Volume)
+  = just telling LVM "hey, use these disks"
+       ↓
+  Combine all PVs into one VG (Volume Group)
+  = one big pool of 36G
+       ↓
+  Cut pieces from VG as LV (Logical Volume)
+  = "give me 500M from that pool"
+       ↓
+  Format & Mount the LV
+  = now you can actually use it!
+```
+
+---
+
 ## ✅ Challenge Tasks
 
 ### Task 1: Check Current Storage

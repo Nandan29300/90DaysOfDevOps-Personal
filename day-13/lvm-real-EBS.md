@@ -163,7 +163,7 @@ PV         VG Fmt  Attr PSize  PFree
 Combine all 3 PVs into one Volume Group called `devops-vg`:
 
 ```bash
-vgcreate devops-vg /dev/sdb /dev/sdc /dev/sdd
+vgcreate devops-vg /dev/xvdf /dev/xvdg /dev/xvdh
 vgs
 ```
 
@@ -173,7 +173,8 @@ vgs
 Volume group "devops-vg" successfully created
 
 VG        #PV #LV #SN Attr   VSize   VFree
-devops-vg   3   0   0 wz--n- 35.99g  35.99g
+devops-vg   3   0   0 wz--n- <35.99g <35.99g
+
 ```
 
 > All 3 disks (10G + 12G + 14G = ~36G) are now **pooled into one group!**
@@ -184,10 +185,10 @@ devops-vg   3   0   0 wz--n- 35.99g  35.99g
 
 ### Task 4: Create Logical Volume (LV)
 
-Carve out a 500M Logical Volume called `app-data` from `devops-vg`:
+Carve out a 10GB Logical Volume called `app-data` from `devops-vg`:
 
 ```bash
-lvcreate -L 500M -n app-data devops-vg
+lvcreate -L 10G -n app-data devops-vg
 lvs
 ```
 
@@ -196,8 +197,8 @@ lvs
 ```
 Logical volume "app-data" created.
 
-LV       VG        Attr       LSize   Pool Origin Data%  Meta%
-app-data devops-vg -wi-a----- 500.00m
+LV       VG        Attr       LSize   Pool Origin Data%  Meta% Move Log Cpy%Sync Convert
+app-data devops-vg -wi-a----- 10.00g
 ```
 
 > 📸 _[Screenshot: lvcreate and lvs output]_
@@ -216,12 +217,18 @@ df -h /mnt/app-data
 **Sample Output:**
 
 ```
-mke2fs 1.45.5 (07-Jan-2020)
-Creating filesystem with 512000 1k blocks and 128016 inodes
-...
+mke2fs 1.47.2 (1-Jan-2025)
+Creating filesystem with 2621440 4k blocks and 655360 inodes
+Filesystem UUID: 012add3f-fa14-46c0-a35c-534c29101321
+Superblock backups stored on blocks:
+    32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632
+Allocating group tables: done
+Writing inode tables: done
+Creating journal (16384 blocks): done
+Writing superblocks and filesystem accounting information: done
 
 Filesystem                        Size  Used Avail Use% Mounted on
-/dev/mapper/devops--vg-app--data  488M  1.6M  452M   1% /mnt/app-data
+/dev/mapper/devops--vg-app--data  9.8G  2.1M  9.3G   1% /mnt/app-data
 ```
 
 > 📸 _[Screenshot: mkfs and df -h /mnt/app-data output]_
@@ -231,7 +238,7 @@ Filesystem                        Size  Used Avail Use% Mounted on
 ### Task 6: Extend the Volume
 
 ```bash
-lvextend -L +200M /dev/devops-vg/app-data
+lvextend -L +1G /dev/devops-vg/app-data
 resize2fs /dev/devops-vg/app-data
 df -h /mnt/app-data
 ```
@@ -239,17 +246,61 @@ df -h /mnt/app-data
 **Sample Output:**
 
 ```
-Size of logical volume devops-vg/app-data changed from 500.00 MiB to 700.00 MiB.
+Size of logical volume devops-vg/app-data changed from 10.00 GiB (2560 extents) to 11.00 GiB (2816 extents).
 Logical volume devops-vg/app-data successfully resized.
 
-resize2fs 1.45.5 (07-Jan-2020)
-The filesystem on /dev/devops-vg/app-data is now 716800 (1k) blocks long.
+resize2fs 1.47.2 (1-Jan-2025)
+Filesystem at /dev/devops-vg/app-data is mounted on /mnt/app-data; on-line resizing required
+old_desc_blocks = 2, new_desc_blocks = 2
+The filesystem on /dev/devops-vg/app-data is now 2883584 (4k) blocks long.
 
 Filesystem                        Size  Used Avail Use% Mounted on
-/dev/mapper/devops--vg-app--data  683M  2.1M  647M   1% /mnt/app-data
+/dev/mapper/devops--vg-app--data   11G  2.1M   11G   1% /mnt/app-data
 ```
 
+
 > 📸 _[Screenshot: lvextend, resize2fs, and final df -h output]_
+
+
+**We can Unmount also**:
+```
+umount /mnt/app-data
+```
+
+⚠️ Before Unmounting - Check if it's busy:
+```
+lsof /mnt/app-data
+```
+
+If any process is using it, unmount will fail. Make sure you're not inside that directory when unmounting!
+
+# Wrong - you're inside the mounted dir
+cd /mnt/app-data
+umount /mnt/app-data   # ❌ will fail - device busy
+
+# Correct - go out first
+cd ~
+umount /mnt/app-data   # ✅ works
+
+---
+
+Since **/mnt/app-data** is **mounted** above, it's usable now!
+# create a file
+```
+touch /mnt/app-data/hello.txt
+```
+
+# create a folder
+```
+mkdir /mnt/app-data/myfolder
+```
+
+# verify
+```
+ls /mnt/app-data
+```
+
+Think of it like a USB drive - once you plug it in (mount), you can store files in it. When you unplug it (unmount), files stay safe inside the disk! 🎯
 
 ---
 
@@ -258,15 +309,15 @@ Filesystem                        Size  Used Avail Use% Mounted on
 | Command | Purpose |
 |---------|---------|
 | `lsblk` | List all block devices (disks) |
-| `pvcreate /dev/sdb /dev/sdc /dev/sdd` | Create Physical Volumes on all 3 disks |
+| `pvcreate /dev/xvdf /dev/xvdg /dev/xvdh` | Create Physical Volumes on all 3 disks |
 | `pvs` | View Physical Volumes |
-| `vgcreate devops-vg /dev/sdb /dev/sdc /dev/sdd` | Create Volume Group from all 3 PVs |
+| `vgcreate devops-vg /dev/xvdf /dev/xvdg /dev/xvdh` | Create Volume Group from all 3 PVs |
 | `vgs` | View Volume Groups |
-| `lvcreate -L 500M -n app-data devops-vg` | Create a 500M Logical Volume |
+| `lvcreate -L 10G -n app-data devops-vg` | Create a 10G Logical Volume |
 | `lvs` | View Logical Volumes |
 | `mkfs.ext4` | Format LV with ext4 filesystem |
 | `mount` | Mount the LV to a directory |
-| `lvextend -L +200M` | Extend the LV by 200M |
+| `lvextend -L +1G` | Extend the LV by 1G |
 | `resize2fs` | Resize filesystem after extending |
 | `df -h` | Check mounted filesystem usage |
 
@@ -278,6 +329,6 @@ Filesystem                        Size  Used Avail Use% Mounted on
 
 2. **The PV → VG → LV layered architecture gives real flexibility** - Instead of being stuck with fixed partition sizes, LVM lets you allocate storage dynamically from the pool as your application needs grow.
 
-3. **Extending volumes online is safe and easy** - Using `lvextend` + `resize2fs`, I grew a mounted filesystem from 500M to 700M with zero downtime. This is extremely useful in production DevOps environments where you can't afford to stop services.
+3. **Extending volumes online is safe and easy** - Using `lvextend` + `resize2fs`, I grew a mounted filesystem from 10G to 11G with zero downtime. This is extremely useful in production DevOps environments where you can't afford to stop services.
 
 ---

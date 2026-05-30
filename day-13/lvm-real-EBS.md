@@ -37,15 +37,22 @@ lsblk
 You should see your 3 new disks:
 
 ```
-NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-sda       8:0    0    8G  0 disk
-└─sda1    8:1    0    8G  0 part /
-sdb       8:16   0   10G  0 disk
-sdc       8:32   0   12G  0 disk
-sdd       8:48   0   14G  0 disk
+NAME     MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+loop0      7:0    0 28.2M  1 loop /snap/amazon-ssm-agent/13009
+loop1      7:1    0   74M  1 loop /snap/core22/2411
+loop2      7:2    0 48.4M  1 loop /snap/snapd/26382
+loop3      7:3    0 49.3M  1 loop /snap/snapd/26865
+xvda     202:0    0    8G  0 disk
+├─xvda1  202:1    0  6.9G  0 part /
+├─xvda13 202:13   0 1023M  0 part /boot
+├─xvda14 202:14   0    4M  0 part
+└─xvda15 202:15   0  106M  0 part /boot/efi
+xvdf     202:80   0   10G  0 disk
+xvdg     202:96   0   12G  0 disk
+xvdh     202:112  0   14G  0 disk
 ```
 
-> 📸 _[Screenshot: lsblk showing sdb, sdc, sdd attached]_
+> 📸 _[Screenshot: lsblk showing sdf(xvdf), sdg(xvdg), sdh(xvdh) attached]_
 
 ---
 

@@ -52,7 +52,15 @@ xvdg     202:96   0   12G  0 disk
 xvdh     202:112  0   14G  0 disk
 ```
 
-> 📸 _[Screenshot: lsblk showing sdf(xvdf), sdg(xvdg), sdh(xvdh) attached]_
+> 📸 **[Below Screenshot: Before lsblk showing sdf(xvdf), sdg(xvdg), sdh(xvdh) attached]**
+
+> <img width="1270" height="715" alt="1" src="https://github.com/user-attachments/assets/d5fb698d-0950-4b9b-a985-ceabeb19752a" />
+
+---
+
+> 📸 **[Below Screenshot: After lsblk showing sdf(xvdf), sdg(xvdg), sdh(xvdh) attached]**
+
+> <img width="1069" height="364" alt="2" src="https://github.com/user-attachments/assets/ec6905e5-7b0a-4857-b2ac-64546bb4ce48" />
 
 ---
 
@@ -128,7 +136,9 @@ tmpfs            96M  8.0K   96M   1% /run/user/1000
 
 ```
 
-> 📸 _[Screenshot: lsblk and df -h output]_
+> 📸 **[Below Screenshot: lsblk and df -h output]**
+
+> <img width="1097" height="702" alt="3" src="https://github.com/user-attachments/assets/f062a098-ecc6-417e-83b6-ad845cd82d6f" />
 
 ---
 
@@ -154,7 +164,9 @@ PV         VG Fmt  Attr PSize  PFree
 /dev/xvdh     lvm2 ---  14.00g 14.00g
 ```
 
-> 📸 _[Screenshot: pvcreate and pvs output]_
+> 📸 **[Below Screenshot: pvcreate and pvs output]**
+
+> <img width="1127" height="252" alt="4" src="https://github.com/user-attachments/assets/4675526b-eb67-431a-ac6c-02fe9143d850" />
 
 ---
 
@@ -179,8 +191,6 @@ devops-vg   3   0   0 wz--n- <35.99g <35.99g
 
 > All 3 disks (10G + 12G + 14G = ~36G) are now **pooled into one group!**
 
-> 📸 _[Screenshot: vgcreate and vgs output]_
-
 ---
 
 ### Task 4: Create Logical Volume (LV)
@@ -201,7 +211,9 @@ LV       VG        Attr       LSize   Pool Origin Data%  Meta% Move Log Cpy%Sync
 app-data devops-vg -wi-a----- 10.00g
 ```
 
-> 📸 _[Screenshot: lvcreate and lvs output]_
+> 📸 **[Below Screenshot: lvcreate and lvs output]**
+ 
+> <img width="1127" height="252" alt="5" src="https://github.com/user-attachments/assets/8f71866c-1324-424f-b554-932859d3e369" />
 
 ---
 
@@ -231,7 +243,10 @@ Filesystem                        Size  Used Avail Use% Mounted on
 /dev/mapper/devops--vg-app--data  9.8G  2.1M  9.3G   1% /mnt/app-data
 ```
 
-> 📸 _[Screenshot: mkfs and df -h /mnt/app-data output]_
+> 📸 **[Below Screenshot: mkfs and df -h /mnt/app-data output]**
+
+> <img width="1134" height="722" alt="6" src="https://github.com/user-attachments/assets/103902e0-ab91-4887-a28b-befdba5e75c5" />
+
 
 ---
 
@@ -259,28 +274,9 @@ Filesystem                        Size  Used Avail Use% Mounted on
 ```
 
 
-> 📸 _[Screenshot: lvextend, resize2fs, and final df -h output]_
+> 📸 **[Below Screenshot: lvextend, resize2fs, and final df -h output]**
 
-
-**We can Unmount also**:
-```
-umount /mnt/app-data
-```
-
-⚠️ Before Unmounting - Check if it's busy:
-```
-lsof /mnt/app-data
-```
-
-If any process is using it, unmount will fail. Make sure you're not inside that directory when unmounting!
-
-# Wrong - you're inside the mounted dir
-cd /mnt/app-data
-umount /mnt/app-data   # ❌ will fail - device busy
-
-# Correct - go out first
-cd ~
-umount /mnt/app-data   # ✅ works
+> <img width="1132" height="803" alt="7" src="https://github.com/user-attachments/assets/0213c6cf-b690-4e32-aa93-4856fa570c7a" />
 
 ---
 
@@ -301,6 +297,28 @@ ls /mnt/app-data
 ```
 
 Think of it like a USB drive - once you plug it in (mount), you can store files in it. When you unplug it (unmount), files stay safe inside the disk! 🎯
+
+---
+
+**We can Unmount also**:
+```
+umount /mnt/app-data
+```
+
+⚠️ Before Unmounting - Check if it's busy:
+```
+lsof /mnt/app-data
+```
+
+If any process is using it, unmount will fail. Make sure you're not inside that directory when unmounting!
+
+# Wrong - you're inside the mounted dir
+cd /mnt/app-data
+umount /mnt/app-data   # ❌ will fail - device busy
+
+# Correct - go out first
+cd ~
+umount /mnt/app-data   # ✅ works
 
 ---
 

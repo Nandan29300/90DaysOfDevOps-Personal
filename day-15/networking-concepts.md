@@ -2,23 +2,57 @@
 
 ---
 
-## Task 1: DNS – How Names Become IPs
+## Task 1: DNS (Domain Name System) – How Names Become IPs
+
+### What is DNS?
+
+**DNS stands for Domain Name System.**
+
+Humans remember names. Computers understand numbers. DNS is the translator between the two.
+
+When you type `youtube.com`, your computer has no idea where that is. DNS converts that name into an IP address like `142.251.43.142` - which is the actual address your browser uses to connect to YouTube's server.
+
+> Think of DNS like a phonebook. You look up "Pizza Hut" (domain name) and get their phone number (IP address). You don't memorize the number - you just look up the name.
+
+---
 
 ### What happens when you type `google.com` in a browser?
 
-When you type `google.com`, your browser first checks its local DNS cache to see if it already knows the IP. If not, it asks the OS, which then queries a DNS resolver (usually your ISP's or a configured one like 8.8.8.8). The resolver works its way through the DNS hierarchy - root servers → TLD servers → authoritative nameservers - and finally returns the IP address. Your browser then uses that IP to send the actual HTTP request to Google's server.
+Here's the full journey, step by step:
+
+1. You type `google.com` and hit Enter
+2. Your browser checks its **local cache** - *"have I visited this recently? do I already know the IP?"*
+3. If not, it asks your **OS (Operating System)**
+4. OS checks its own cache, then asks a **DNS Resolver** (usually your ISP's server or Google's 8.8.8.8)
+5. The resolver doesn't know the answer directly - it goes on a hunt:
+   - Asks a **Root Server** → *"who handles .com domains?"*
+   - Root server says → *"ask the TLD (Top Level Domain) server"*
+   - TLD server says → *"ask Google's authoritative nameserver"*
+   - Authoritative nameserver says → *"google.com = 142.250.183.78"*
+6. Resolver sends that IP back to your browser
+7. Browser connects to `142.250.183.78` → Google loads
+
+All of this happens in **milliseconds**. Every. Single. Time.
+
+---
 
 ### DNS Record Types
 
-| Record | What it does |
-|--------|--------------|
-| **A** | Maps a domain name to an IPv4 address |
-| **AAAA** | Maps a domain name to an IPv6 address |
-| **CNAME** | Alias - points one domain to another domain instead of an IP |
-| **MX** | Specifies which mail exchange servers handle email for the domain |
-| **NS** | Nameserver - Tells the world which DNS server is authoritative for the domain |
+DNS doesn't just store IP addresses - it stores different types of records for different purposes:
 
-### `dig google.com` - Output
+| Record | Full Form | What it does | Example |
+|--------|-----------|--------------|---------|
+| **A** | Address Record | Maps a domain to an **IPv4** address | `google.com → 142.250.183.78` |
+| **AAAA** | IPv6 Address Record | Maps a domain to an **IPv6** address | `google.com → 2607:f8b0::200e` |
+| **CNAME** | Canonical Name Record | Alias - points one domain to **another domain** | `www.google.com → google.com` |
+| **MX** | Mail Exchange Record | Tells email where to go | `gmail.com → mail server` |
+| **NS** | Nameserver Record | Says which DNS server is authoritative (authoritative nameserver = the final boss who actually knows the real IP, real records, everything about that domain) for this domain | `google.com → ns1.google.com` |
+
+---
+
+### `dig google.com` - Command Output
+
+`dig` stands for **Domain Information Groper** - it's a command to manually query DNS.
 
 ```bash
 $ dig google.com
@@ -28,41 +62,78 @@ $ dig google.com
 google.com.     247     IN      A       142.250.183.78
 ```
 
-- **A record:** `142.250.183.78` - this is the IPv4 address Google's domain resolves to
-- **TTL:** `247` seconds - after this, the resolver will re-fetch the record instead of using cached data
+Breaking this down:
+- **`google.com.`** → the domain we queried
+- **`247`** → TTL (Time To Live) in seconds - this answer is cached for 247 seconds, after which your computer re-asks DNS
+- **`IN`** → Internet class (always IN for normal DNS)
+- **`A`** → record type (IPv4 address)
+- **`142.250.183.78`** → the actual IP address of google.com
+
+> **TTL = expiry timer.** Like milk with an expiry date - after TTL expires, your computer throws away the cached answer and fetches a fresh one.
 
 ---
 
 ## Task 2: IP Addressing
 
-### What is an IPv4 address?
+### What is an IPv4 Address?
 
-An IPv4 address is a 32-bit number used to identify a device on a network. It's written as four decimal numbers (0–255) separated by dots - for example, `192.168.1.10`. Each group is called an **octet** (8 bits), and together they make up the full address that tells traffic where to go.
+**IPv4 stands for Internet Protocol version 4.**
 
-### Public vs Private IPs
+Every device on a network gets an IP address - it's like a home address for your computer. Without it, data wouldn't know where to go.
 
-| Type | Description | Example |
-|------|-------------|---------|
-| **Public IP** | Routable over the internet; assigned by ISP | `8.8.8.8` (Google DNS) |
-| **Private IP** | Used only inside local/internal networks; not internet-routable | `192.168.1.23` (home/LAN) |
+An IPv4 address is a **32-bit number** written as 4 groups of numbers separated by dots:
+
+```
+192  .  168  .  1  .  10
+ ↑        ↑      ↑    ↑
+ 8bits   8bits  8bits  8bits  =  32 bits total
+```
+
+Each group (called an **octet**) can be between **0 and 255**.
+
+So `192.168.1.10` is a perfectly valid IPv4 address.
+
+---
+
+### Public IP vs Private IP
+
+- Public IP: ISP assigns it dynamically. every time your router restarts, or sometimes daily - new public IP. that's why it's called **dynamic IP**.
+- Private IP: router assigns it via DHCP (Dynamic Host Configuration Protocol)
+ 
+```
+  Both can change frequently, but we can make it permanent by setting static public/private IP.
+```
+  
+| Type | What it is | Example | Who assigns it |
+|------|-----------|---------|----------------|
+| **Public IP / dynamic IP** | Visible on the internet, globally unique | `8.8.8.8` | Your ISP (Jio, Airtel etc.) |
+| **Private IP** | Only exists inside your local network, invisible to internet | `192.168.1.23` | Your router |
+
+**Real life example:**
+
+Your apartment building has **one street address** (public IP) - that's what the outside world sees.
+
+Inside the building, each flat has a **flat number** (private IP) - 101, 102, 103. These flat numbers mean nothing to someone outside the building.
+
+When you get a letter (internet traffic), it comes to the building's address (public IP), and your router (the security guard) forwards it to the right flat (private IP).
+
+---
 
 ### Private IP Ranges
 
-```
-10.0.0.0    – 10.255.255.255      (10.x.x.x) - Huge - 16 million IPs - Large companies, AWS VPCs, data centers
-172.16.0.0  – 172.31.255.255      (172.16.x.x – 172.31.x.x) - Medium - 1 million IPs - Medium networks
-192.168.0.0 – 192.168.255.255     (192.168.x.x) - Small - 65k IPs - Home routers, small offices
-```
+These ranges are **reserved** - no ISP will ever route them on the public internet. They're safe to use inside any private network without conflict.
 
 ```
-The important thing is the contract: no ISP will ever route these on the public internet. So 10.0.0.1 in your office and 10.0.0.1 in my office are completely separate — they never collide because they never leave their own networks.
+10.0.0.0  –  10.255.255.255     →  ~16 million IPs  →  Large companies, AWS VPCs, data centers
+172.16.0.0 – 172.31.255.255     →  ~1 million IPs   →  Medium-sized networks
+192.168.0.0 – 192.168.255.255   →  ~65,000 IPs      →  Home routers, small offices
 ```
 
-```
-every computer has a DNS server configured; by default it's usually your ISP's DNS (Jio, Airtel, BSNL — whoever gives you internet). 8.8.8.8 is just Google's option that you can manually switch to if you want.
-```
+> **Why these specific ranges?** IANA (Internet Assigned Numbers Authority) simply reserved them decades ago and declared: *"these will never go on the public internet."* Everyone agreed. Now it's a global standard. Your `192.168.1.1` at home and my `192.168.1.1` at my home are completely separate - they never collide because they never leave their own networks.
 
-### `ip addr show` - Output
+---
+
+### `ip addr show` - Command Output
 
 ```bash
 $ ip addr show
@@ -74,59 +145,138 @@ $ ip addr show
     inet 127.0.0.1/8 scope host lo
 ```
 
-- `172.31.45.12` → falls in the `172.16.x.x – 172.31.x.x` range → **private IP** (AWS EC2 internal)
-- `127.0.0.1` → loopback address (localhost), not routable at all
+- `172.31.45.12` → falls in `172.16.x.x – 172.31.x.x` range → **private IP** (AWS EC2 internal address)
+- `127.0.0.1` → **loopback address** (localhost) - your machine talking to itself, not routable anywhere
 
 ---
 
-## Task 3: CIDR & Subnetting
+## Task 3: CIDR (Classless Inter-Domain Routing) & Subnetting
 
-- CIDR (Classless Inter-Domain Routing): Compact way to show IP range & subnet size
+### What is CIDR?
 
+**CIDR stands for Classless Inter-Domain Routing.**
+
+It's a compact way to write an IP address + its network size together.
+
+Example: `192.168.1.0/24`
+
+The `/24` part is called the **prefix length** - it tells you how many bits are reserved for the **network**, and how many are left for **hosts (devices)**.
+
+---
 
 ### What does `/24` mean in `192.168.1.0/24`?
 
-The `/24` is the **prefix length** - it means the first 24 bits of the address are the **network** portion, and the remaining 8 bits are available for **hosts**. In terms of subnet mask, `/24` = `255.255.255.0`. So `192.168.1.0/24` covers all addresses from `192.168.1.0` to `192.168.1.255`.
+An IP address has 32 bits total.
 
-### Usable Hosts
+`/24` means → first **24 bits = network**, remaining **8 bits = hosts**
 
-- **/24** → 256 total − 2 (network + broadcast) = **254 usable hosts**
-- **/16** → 65,536 total − 2 = **65,534 usable hosts**
-- **/28** → 16 total − 2 = **14 usable hosts**
+```
+192.168.1  .  0
+←  24 bits  → ← 8 bits →
+  (network)    (hosts)
+```
+
+Subnet mask equivalent: `255.255.255.0`
+
+So `192.168.1.0/24` covers addresses from `192.168.1.0` to `192.168.1.255` - that's 256 addresses in one network.
+
+---
+
+### Usable Hosts Calculation
+
+In every subnet, 2 addresses are always reserved:
+- **First address** → Network address / CIDR base IP (identifies the subnet itself)
+- **Last address** → Broadcast address / Boroadcast IP (sends data to all devices in subnet)
+
+So usable = Total − 2
+
+| CIDR | Total IPs | Minus 2 | Usable Hosts |
+|------|-----------|---------|--------------|
+| /24  | 256       | −2      | **254**      |
+| /16  | 65,536    | −2      | **65,534**   |
+| /28  | 16        | −2      | **14**       |
+
+---
 
 ### Why do we subnet?
 
-Instead of dumping every device into one giant network (which gets chaotic and insecure), subnetting lets you carve the network into smaller, manageable chunks. Each subnet is its own isolated segment - so a breach in one doesn't automatically expose others, broadcast traffic is reduced, and you can apply different security rules per segment. Basically: better organization, better security, less noise.
+Imagine a school with 1000 students all sharing one giant classroom. Chaos. Nobody can hear anyone. One person sneezes and everyone knows.
 
-### CIDR Table
+Subnetting is like dividing that school into **separate classrooms** - each with its own group, its own rules, its own door.
+
+Benefits:
+- **Security** - a breach in one subnet doesn't automatically spread to others
+- **Performance** - less broadcast traffic (devices stop shouting to the entire network)
+- **Organization** - HR team on one subnet, Engineering on another, Database servers on another
+- **Control** - apply different firewall rules per subnet
+
+> On AWS, this is exactly why you have **public subnets** (for web servers) and **private subnets** (for databases) inside a VPC.
+
+---
+
+### CIDR Quick Reference Table
 
 | CIDR | Subnet Mask | Total IPs | Usable Hosts |
 |------|-------------|-----------|--------------|
-| /24  | 255.255.255.0   | 256    | 254   |
+| /24  | 255.255.255.0   | 256    | 254    |
 | /16  | 255.255.0.0     | 65,536 | 65,534 |
-| /28  | 255.255.255.240 | 16     | 14    |
+| /28  | 255.255.255.240 | 16     | 14     |
 
 ---
 
 ## Task 4: Ports – The Doors to Services
 
-### What is a port? Why do we need them?
+### What is a Port? Why do we need them?
 
-A port is a logical number (0–65535) attached to a network connection that tells the OS which application should receive incoming data. Without ports, if two services (say, SSH and a web server) ran on the same machine, the OS would have no way to know which traffic goes where. Ports solve that - SSH listens on 22, HTTP on 80, and they can all share the same IP without stepping on each other.
+Your server has one IP address. But it runs multiple services at the same time - SSH, a web server, a database, maybe Redis.
 
-### Common Ports
+How does the server know which incoming traffic goes to which service?
 
-| Port  | Service |
-|-------|---------|
-| 22    | SSH - secure remote login |
-| 80    | HTTP - unencrypted web traffic |
-| 443   | HTTPS - encrypted web traffic |
-| 53    | DNS - domain name resolution |
-| 3306  | MySQL - relational database |
-| 6379  | Redis - in-memory cache/store |
-| 27017 | MongoDB - NoSQL document database |
+**Ports.**
 
-### `ss -tulpn` - Output
+A port is a **logical number (0–65535)** that acts like a door number on a building. The IP address gets you to the building. The port gets you to the right room.
+
+```
+IP Address  =  the building address
+Port        =  the flat/room number inside
+```
+
+**Real example:**
+
+You SSH into your EC2 server:
+```bash
+ssh -i key.pem ubuntu@54.23.12.10
+```
+Your computer connects to IP `54.23.12.10` on **port 22** - because that's where SSH lives.
+
+At the same time, someone else hits your nginx web server at the same IP on **port 80**. Both connections land on the same machine, different port, different service. No confusion.
+
+---
+
+### Common Ports Every DevOps Engineer Must Know
+
+| Port  | Service | What it does |
+|-------|---------|--------------|
+| 22    | SSH (Secure Shell) | Encrypted remote login to servers |
+| 80    | HTTP (HyperText Transfer Protocol) | Unencrypted web traffic |
+| 443   | HTTPS (HTTP Secure) | Encrypted web traffic (SSL/TLS) |
+| 53    | DNS (Domain Name System) | Domain name resolution queries |
+| 3306  | MySQL | Relational database communication |
+| 6379  | Redis | In-memory cache / message broker |
+| 27017 | MongoDB | NoSQL document database |
+
+---
+
+### `ss -tulpn` - Command Output
+
+`ss` stands for **Socket Statistics** - shows all active listening ports on your machine.
+
+Flags breakdown:
+- `-t` → TCP connections
+- `-u` → UDP connections
+- `-l` → only listening ports
+- `-p` → show process name
+- `-n` → show port numbers (not service names)
 
 ```bash
 $ ss -tulpn
@@ -136,8 +286,11 @@ tcp    LISTEN  0.0.0.0:22          0.0.0.0:*           users:(("sshd",pid=592,fd
 tcp    LISTEN  0.0.0.0:80          0.0.0.0:*           users:(("nginx",pid=700,fd=6))
 ```
 
-- Port `22` → **sshd** running → SSH is active and accepting connections
-- Port `80` → **nginx** running → web server is live and serving HTTP
+Reading this:
+- `0.0.0.0:22` → **sshd** is listening on port 22 on all interfaces → SSH is active
+- `0.0.0.0:80` → **nginx** is listening on port 80 → web server is running
+
+> If a port doesn't show here - the service is not running. First thing to check when something can't connect.
 
 ---
 
@@ -145,24 +298,56 @@ tcp    LISTEN  0.0.0.0:80          0.0.0.0:*           users:(("nginx",pid=700,f
 
 ### You run `curl http://myapp.com:8080` - what networking concepts are involved?
 
-First, **DNS** kicks in to resolve `myapp.com` into an IP address. Then a **TCP connection** is established to that IP on **port 8080** - port being the key detail here since it's non-standard (not the default 80). The OS uses the IP (from **IP addressing**) and the port together to route the request to the right service on the right machine. If the server is behind a subnet, **routing** rules determine how packets actually get there.
+```
+curl http://myapp.com:8080
+```
+
+Step by step:
+
+1. **DNS** resolves `myapp.com` → gets an IP address
+2. **IP addressing** - now the OS knows where to send the request
+3. **Port 8080** - non-standard port (default HTTP is 80), so this app is running on a custom port
+4. A **TCP connection** is established to that IP:port
+5. The HTTP request goes through - if the server is listening on 8080, you get a response
+
+Every single concept from today is involved in this one command.
+
+---
 
 ### Your app can't reach a database at `10.0.1.50:3306` - what do you check first?
 
-1. **Basic connectivity** - `ping 10.0.1.50` to see if the host is reachable at all. If ping fails, it's a routing or firewall issue, not the database.
-2. **Port availability** - `ss -tulpn` on the DB server to confirm MySQL is actually listening on 3306. Dead service = no connection.
-3. **Firewall/Security Group rules** - check if port 3306 is blocked between the two machines (especially on AWS where Security Groups control this per-instance).
+`10.0.1.50` is a private IP (10.x.x.x range) - so this database is inside your internal network (like AWS VPC).
+
+Debugging order:
+
+**Step 1 - Is the host reachable?**
+```bash
+ping 10.0.1.50
+```
+If ping fails → routing issue or firewall blocking all traffic. Database problem? Not yet your concern.
+
+**Step 2 - Is MySQL actually running on that machine?**
+```bash
+ss -tulpn | grep 3306
+```
+If port 3306 doesn't show → MySQL is down. Start the service first.
+
+**Step 3 - Is the port blocked between machines?**
+```bash
+telnet 10.0.1.50 3306
+```
+If this fails but ping works → firewall or AWS Security Group is blocking port 3306 specifically. Open it.
+
+> On AWS - Security Groups are the #1 reason port-level connectivity fails. Always check inbound rules.
 
 ---
 
 ## What I Learned
 
-1. **DNS is a multi-step lookup chain** - your browser doesn't magically know IPs; it goes through cache → resolver → authoritative servers, and TTL controls how long that answer is trusted before re-fetching.
+1. **DNS is an automatic phonebook running silently in the background** - every domain name you type triggers a lookup chain (cache → resolver → root → TLD → authoritative), and TTL controls how long answers are remembered before re-fetching.
 
-2. **IP addressing has structure and intent** - public IPs are internet-facing, private IPs stay internal, and CIDR notation is how you define the boundary between "network" and "host" bits. Subnetting is essentially network segmentation with math.
+2. **IP addresses have intent built into their structure** - public IPs face the internet, private IPs stay internal, and CIDR notation precisely defines how many devices a network can hold. Subnetting is how you carve large networks into secure, organized segments.
 
-3. **Ports are what make multi-service machines possible** - one IP, many services, all separated by port numbers. Knowing the common ones (22, 80, 443, 3306) is instant debugging power when something can't connect.
+3. **Ports are what make one server run many services simultaneously** - the IP gets traffic to the machine, the port gets it to the right application. Knowing which service lives on which port (22, 80, 443, 3306) is the first instinct when debugging any connectivity issue.
 
 ---
-
-*Day 15 of #90DaysOfDevOps | #DevOpsKaJosh | #TrainWithShubham*

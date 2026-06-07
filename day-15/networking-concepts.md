@@ -57,17 +57,38 @@ DNS doesn't just store IP addresses - it stores different types of records for d
 ```bash
 $ dig google.com
 
-; <<>> DiG 9.18.1 <<>> google.com
+; <<>> DiG 9.20.18-1ubuntu2.1-Ubuntu <<>> google.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 19
+;; flags: qr rd ra; QUERY: 1, ANSWER: 6, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 65494
+;; QUESTION SECTION:
+;google.com.			IN	A
+
 ;; ANSWER SECTION:
-google.com.     247     IN      A       142.250.183.78
+google.com.		108	IN	A	142.251.16.102
+google.com.		108	IN	A	142.251.16.113
+google.com.		108	IN	A	142.251.16.138
+google.com.		108	IN	A	142.251.16.139
+google.com.		108	IN	A	142.251.16.100
+google.com.		108	IN	A	142.251.16.101
+
+;; Query time: 2 msec
+;; SERVER: 127.0.0.53#53(127.0.0.53) (UDP)
+;; WHEN: Sun Jun 07 07:59:01 UTC 2026
+;; MSG SIZE  rcvd: 135
+
 ```
 
 Breaking this down:
 - **`google.com.`** → the domain we queried
-- **`247`** → TTL (Time To Live) in seconds - this answer is cached for 247 seconds, after which your computer re-asks DNS
+- **`108`** → TTL (Time To Live) in seconds - this answer is cached for 108 seconds, after which your computer re-asks DNS
 - **`IN`** → Internet class (always IN for normal DNS)
 - **`A`** → record type (IPv4 address)
-- **`142.250.183.78`** → the actual IP address of google.com
+- Google doesn't run on one server - they have thousands of servers worldwide; so google.com has multiple IPs - all pointing to different Google servers.
 
 > **TTL = expiry timer.** Like milk with an expiry date - after TTL expires, your computer throws away the cached answer and fetches a fresh one.
 
@@ -138,11 +159,19 @@ These ranges are **reserved** - no ISP will ever route them on the public intern
 ```bash
 $ ip addr show
 
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP>
-    inet 172.31.45.12/20 brd 172.31.47.255 scope global eth0
-
-1: lo: <LOOPBACK,UP,LOWER_UP>
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+2: enX0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc fq_codel state UP group default qlen 1000
+    link/ether 0a:ff:fb:22:25:dd brd ff:ff:ff:ff:ff:ff
+    altname enx0afffb2225dd
+    inet 172.31.45.12/20 metric 100 brd 172.31.31.255 scope global dynamic enX0
+       valid_lft 3251sec preferred_lft 3251sec
+    inet6 fe80::8ff:fbff:fe22:25dd/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
 ```
 
 - `172.31.45.12` → falls in `172.16.x.x – 172.31.x.x` range → **private IP** (AWS EC2 internal address)
@@ -281,9 +310,18 @@ Flags breakdown:
 ```bash
 $ ss -tulpn
 
-Netid  State   Local Address:Port   Peer Address:Port   Process
-tcp    LISTEN  0.0.0.0:22          0.0.0.0:*           users:(("sshd",pid=592,fd=3))
-tcp    LISTEN  0.0.0.0:80          0.0.0.0:*           users:(("nginx",pid=700,fd=6))
+Netid                State                 Recv-Q                Send-Q                                    Local Address:Port                               Peer Address:Port               Process                
+udp                  UNCONN                0                     0                                            127.0.0.54:53                                      0.0.0.0:*                                 
+udp                  UNCONN                0                     0                                         127.0.0.53%lo:53                                      0.0.0.0:*                                 
+udp                  UNCONN                0                     0                                    172.31.19.100%enX0:68                                      0.0.0.0:*                                 
+udp                  UNCONN                0                     0                                             127.0.0.1:323                                     0.0.0.0:*                                 
+udp                  UNCONN                0                     0                                                 [::1]:323                                        [::]:*                                       
+tcp                  LISTEN                0                     4096                                            0.0.0.0:22                                      0.0.0.0:*                                 
+tcp                  LISTEN                0                     4096                                      127.0.0.53%lo:53                                      0.0.0.0:*                                 
+tcp                  LISTEN                0                     511                                             0.0.0.0:80                                      0.0.0.0:*                                 
+tcp                  LISTEN                0                     4096                                         127.0.0.54:53                                      0.0.0.0:*                                 
+tcp                  LISTEN                0                     4096                                               [::]:22                                         [::]:*                                 
+tcp                  LISTEN                0                     511                                                [::]:80                                         [::]:*   
 ```
 
 Reading this:

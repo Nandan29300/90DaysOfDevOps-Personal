@@ -111,7 +111,7 @@ echo "Hello, DevOps!"
 ```bash
 #!/bin/bash
 
-NAME="Bhavna"
+NAME="Nandan"
 ROLE="DevOps Engineer"
 
 echo "Hello, I am $NAME and I am a $ROLE"
@@ -120,16 +120,16 @@ echo "Hello, I am $NAME and I am a $ROLE"
 ### Output
 
 ```
-Hello, I am Bhavna and I am a DevOps Engineer
+Hello, I am Nandan and I am a DevOps Engineer
 ```
 
 ### How Variables Work in Bash
 
 **Declaring a variable:**
 ```bash
-NAME="Bhavna"
+NAME="Nandan"
 ```
-⚠️ **No spaces** around the `=` sign. `NAME = "Bhavna"` will throw an error - Bash treats `NAME` as a command.
+⚠️ **No spaces** around the `=` sign. `NAME = "Nandan"` will throw an error - Bash treats `NAME` as a command.
 
 **Using a variable:**
 ```bash
@@ -153,9 +153,9 @@ This is one of the most important distinctions in Bash:
 **Example:**
 
 ```bash
-NAME="Bhavna"
+NAME="Nandan"
 
-echo "Hello, $NAME"    # Output: Hello, Bhavna
+echo "Hello, $NAME"    # Output: Hello, Nandan
 echo 'Hello, $NAME'    # Output: Hello, $NAME
 ```
 
@@ -180,9 +180,9 @@ echo "Hello $USER_NAME, your favourite tool is $FAV_TOOL"
 ### Sample Interaction
 
 ```
-Enter your name: Bhavna
+Enter your name: Nandan
 Enter your favourite tool: Docker
-Hello Bhavna, your favourite tool is Docker
+Hello Nandan, your favourite tool is Docker
 ```
 
 ### How `read` Works

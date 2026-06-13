@@ -205,10 +205,10 @@ echo "✅ Done!"
 
 **Key concepts used:**
 
-- ^ : Start of string
-- [0-9] : Any digit 0–9
-- + : One or more digits
-- $ : End of string
+- `^` : Start of string
+- `[0-9]` : Any digit 0–9
+- `+` : One or more digits
+- `$` : End of string
 
 | Operator | Meaning |
 |---|---|

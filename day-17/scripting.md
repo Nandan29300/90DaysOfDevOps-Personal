@@ -19,8 +19,6 @@
 
 ## Overview
 
-Shell scripting moves beyond one-liners - today we write **real automation scripts** with:
-
 | Concept | Purpose |
 |---|---|
 | `for` loop | Iterate over a known list or range |
@@ -101,7 +99,7 @@ for i in {1..10}; do
 done
 
 echo ""
-echo "Counting in steps of 2 (bonus):"
+echo "Counting in steps of 2:"
 
 # Method 2: C-style for loop
 for ((i=1; i<=10; i+=2)); do
@@ -123,7 +121,7 @@ Counting from 1 to 10:
   Number: 9
   Number: 10
 
-Counting in steps of 2 (bonus):
+Counting in steps of 2:
   Odd: 1
   Odd: 3
   Odd: 5
@@ -206,6 +204,11 @@ echo "✅ Done!"
 ```
 
 **Key concepts used:**
+
+- ^ : Start of string
+- [0-9] : Any digit 0–9
+- + : One or more digits
+- $ : End of string
 
 | Operator | Meaning |
 |---|---|
@@ -567,7 +570,16 @@ Hello from Day 17 - DevOps Scripting!
 ⚠️  Directory already exists - continuing.
 📂 Step 2: Navigating into /tmp/devops-test ...
    Currently in: /tmp/devops-test
-...
+📄 Step 3: Creating hello.txt ...
+   File created: -rw-rw-r-- 1 ubuntu ubuntu 38 Jun 13 12:53 hello.txt
+
+📖 File contents:
+---
+Hello from Day 17 - DevOps Scripting!
+---
+
+✅ All steps completed successfully!
+
 ```
 
 ---
@@ -593,6 +605,51 @@ if ! mkdir /tmp/test; then
     exit 1
 fi
 ```
+
+## `trap` – Cleanup on Exit
+
+**What it does:** Automatically runs cleanup commands when the script exits.
+
+**Example:**
+```bash
+#!/bin/bash
+trap "rm -f /tmp/lockfile; echo 'Cleaned up!'" EXIT
+
+echo "Script is running..."
+touch /tmp/lockfile
+echo "Doing some work..."
+# script ends here → trap fires automatically
+```
+
+**Output:**
+
+- Script is running...
+- Doing some work...
+- Cleaned up!
+
+---
+
+## `if + command` – Handle Command Failure
+
+**What it does:** Runs a command and checks if it failed.
+
+**Example:**
+```bash
+#!/bin/bash
+if ! mkdir /tmp/testdir; then
+    echo "Error: Could not create directory!"
+    exit 1
+fi
+echo "Directory created successfully!"
+```
+
+**Output (if folder already exists):**
+
+- mkdir: cannot create directory '/tmp/testdir': File exists
+- Error: Could not create directory!
+
+**Output (if folder does not exist):**
+- Directory created successfully!
 
 ---
 
@@ -723,5 +780,3 @@ dpkg -s pkg &>/dev/null && echo "Installed"
 ```
 
 ---
-
-*Day 17 Complete ✅ | #90DaysOfDevOps #DevOpsKaJosh #TrainWithShubham*

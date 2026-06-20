@@ -1,7 +1,5 @@
 # Day 19 - Shell Scripting Project: Log Rotation, Backup & Crontab
 
-> **#90DaysOfDevOps | #DevOpsKaJosh | #TrainWithShubham**
-
 ---
 
 ## 📚 Table of Contents
@@ -455,7 +453,3 @@ echo "msg" | tee -a log.txt                   # Print + append to file
 ```
 
 ---
-
-*Day 19 Complete ✅ | Next: Day 20*
-
-`#90DaysOfDevOps` `#DevOpsKaJosh` `#TrainWithShubham` `#ShellScripting` `#Linux`

@@ -97,23 +97,17 @@ Without log rotation, `/var/log/` can fill up your disk and crash your server!
 # =============================================================================
 
 set -euo pipefail
-# set -e  → Exit immediately on any error
-# set -u  → Treat unset variables as errors
-# set -o pipefail → Catch errors in pipelines (cmd1 | cmd2)
 
-# ── Colour helpers ───────────────────────────────────────────────────────────
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m'   # No Colour
+NC='\033[0m'
 
-# ── log() helper: prints timestamped messages ─────────────────────────────
 log() {
     echo -e "${BLUE}[$(date '+%Y-%m-%d %H:%M:%S')]${NC} $1"
 }
 
-# ── validate_directory() – exit if dir doesn't exist ─────────────────────
 validate_directory() {
     local dir="$1"
     if [[ ! -d "$dir" ]]; then
@@ -122,25 +116,26 @@ validate_directory() {
     fi
 }
 
-# ── compress_old_logs() – gzip files older than 7 days ───────────────────
 compress_old_logs() {
     local dir="$1"
     local count=0
 
     log "Scanning for .log files older than 7 days in: $dir"
 
-    # Find .log files modified more than 7 days ago
     while IFS= read -r -d '' file; do
-        gzip "$file"
-        log "Compressed: $file → ${file}.gz"
-        ((count++))
+        if [ -s "$file" ]; then
+            gzip "$file"
+            log "Compressed: $file → ${file}.gz"
+            ((count++)) || true
+        else
+            log "Skipped (empty): $file"
+        fi
     done < <(find "$dir" -name "*.log" -mtime +7 -print0)
 
     echo -e "${GREEN}✔ Files compressed: $count${NC}"
     COMPRESSED_COUNT=$count
 }
 
-# ── delete_old_archives() – remove .gz files older than 30 days ──────────
 delete_old_archives() {
     local dir="$1"
     local count=0
@@ -150,16 +145,14 @@ delete_old_archives() {
     while IFS= read -r -d '' file; do
         rm -f "$file"
         log "Deleted: $file"
-        ((count++))
+        ((count++)) || true
     done < <(find "$dir" -name "*.gz" -mtime +30 -print0)
 
     echo -e "${GREEN}✔ Archives deleted: $count${NC}"
     DELETED_COUNT=$count
 }
 
-# ── main() ────────────────────────────────────────────────────────────────
 main() {
-    # Argument check
     if [[ $# -ne 1 ]]; then
         echo "Usage: $0 <log_directory>"
         echo "Example: $0 /var/log/myapp"
@@ -170,7 +163,6 @@ main() {
 
     log "=== Log Rotation Started ==="
     validate_directory "$LOG_DIR"
-
     compress_old_logs "$LOG_DIR"
     delete_old_archives "$LOG_DIR"
 

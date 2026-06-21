@@ -523,67 +523,100 @@ main "$@"
 
 ## Sample Outputs
 
-### log_rotate.sh Output
-
+### log_rotate.sh
+ 
 ```
-[2026-06-20 02:00:01] === Log Rotation Started ===
-[2026-06-20 02:00:01] Scanning for .log files older than 7 days in: /var/log/myapp
-[2026-06-20 02:00:02] Compressed: /var/log/myapp/app-2026-06-10.log → /var/log/myapp/app-2026-06-10.log.gz
-[2026-06-20 02:00:02] Compressed: /var/log/myapp/app-2026-06-11.log → /var/log/myapp/app-2026-06-11.log.gz
-[2026-06-20 02:00:02] Compressed: /var/log/myapp/error-2026-06-09.log → /var/log/myapp/error-2026-06-09.log.gz
-✔ Files compressed: 3
-[2026-06-20 02:00:02] Scanning for .gz files older than 30 days in: /var/log/myapp
-[2026-06-20 02:00:02] Deleted: /var/log/myapp/app-2026-05-10.log.gz
-✔ Archives deleted: 1
-
+[2026-06-21 07:07:59] === Log Rotation Started ===
+[2026-06-21 07:07:59] Scanning for .log files older than 7 days in: /home/ubuntu/testlogs/
+[2026-06-21 07:07:59] Skipped (empty): /home/ubuntu/testlogs/recent.log
+[2026-06-21 07:07:59] Compressed: /home/ubuntu/testlogs/error.log → /home/ubuntu/testlogs/error.log.gz
+[2026-06-21 07:07:59] Compressed: /home/ubuntu/testlogs/app.log → /home/ubuntu/testlogs/app.log.gz
+✔ Files compressed: 2
+[2026-06-21 07:07:59] Scanning for .gz files older than 30 days in: /home/ubuntu/testlogs/
+✔ Archives deleted: 0
+ 
 === Log Rotation Summary ===
-  Directory  : /var/log/myapp
-  Compressed : 3 file(s)
-  Deleted    : 1 file(s)
-[2026-06-20 02:00:02] === Log Rotation Complete ===
+  Directory  : /home/ubuntu/testlogs/
+  Compressed : 2 file(s)
+  Deleted    : 0 file(s)
+[2026-06-21 07:07:59] === Log Rotation Complete ===
 ```
 
-### backup.sh Output
-
+### backup.sh
+ 
 ```
-[2026-06-20 03:00:01] === Server Backup Started ===
-[2026-06-20 03:00:01] Creating archive: backup-2026-06-20.tar.gz
-✔ Archive verified: /backups/backup-2026-06-20.tar.gz
-  Size: 47M
-[2026-06-20 03:00:09] Removing backups older than 14 days from: /backups
-[2026-06-20 03:00:09] Removed old backup: /backups/backup-2026-06-05.tar.gz
-✔ Old backups deleted: 1
-
+[2026-06-21 06:22:36] === Server Backup Started ===
+[2026-06-21 06:22:36] Creating archive: backup-2026-06-21.tar.gz
+✔ Archive verified: /backups/backup-2026-06-21.tar.gz
+  Size: 4.3M
+[2026-06-21 06:22:37] Removing backups older than 14 days from: /backups
+✔ Old backups deleted: 0
+ 
 === Backup Summary ===
-  Source      : /var/www/myapp
+  Source      : /var/log
   Destination : /backups
-  Archive     : backup-2026-06-20.tar.gz
-  Size        : 47M
-[2026-06-20 03:00:09] === Backup Complete ===
+  Archive     : backup-2026-06-21.tar.gz
+  Size        : 4.3M
+[2026-06-21 06:22:37] === Backup Complete ===
 ```
 
-### /var/log/maintenance.log (sample)
-
+### maintenance.sh
+ 
 ```
-[2026-06-20 01:00:00] ========================================
-[2026-06-20 01:00:00] === Maintenance Window Started ===
-[2026-06-20 01:00:00] ========================================
-[2026-06-20 01:00:00] >>> Starting Log Rotation for: /var/log/myapp
-[2026-06-20 01:00:01] Compressed: /var/log/myapp/app-2026-06-10.log → .gz
-[2026-06-20 01:00:01] ✔ Log rotation completed successfully.
-[2026-06-20 01:00:01] >>> Starting Backup: /var/www/myapp → /backups
-[2026-06-20 01:00:05] ✔ Backup completed successfully.
-[2026-06-20 01:00:05] ========================================
-[2026-06-20 01:00:05] === Maintenance Window Complete ===
-[2026-06-20 01:00:05] ========================================
+[2026-06-21 07:07:59] ========================================
+[2026-06-21 07:07:59] === Maintenance Window Started ===
+[2026-06-21 07:07:59] ========================================
+[2026-06-21 07:07:59] >>> Starting Log Rotation for: /var/log
+[2026-06-21 07:07:59] ✔ Log rotation completed successfully.
+[2026-06-21 07:07:59] >>> Starting Backup: /var/log → /backups
+[2026-06-21 07:08:00] ✔ Backup completed successfully.
+[2026-06-21 07:08:00] ========================================
+[2026-06-21 07:08:00] === Maintenance Window Complete ===
+[2026-06-21 07:08:00] ========================================
 ```
 
-### Error Case Output (directory not found)
+### /var/log/maintenance.log
+ 
+```
+[2026-06-21 07:07:59] === Maintenance Window Started ===
+[2026-06-21 07:07:59] >>> Starting Log Rotation for: /var/log
+[2026-06-21 07:07:59] === Log Rotation Started ===
+[2026-06-21 07:07:59] Scanning for .log files older than 7 days in: /var/log
+[2026-06-21 07:07:59] Skipped (empty): /var/log/alternatives.log
+[2026-06-21 07:07:59] Skipped (empty): /var/log/ubuntu-advantage-apt-hook.log
+[2026-06-21 07:07:59] Skipped (empty): /var/log/apt/history.log
+✔ Files compressed: 0
+[2026-06-21 07:07:59] Scanning for .gz files older than 30 days in: /var/log
+✔ Archives deleted: 0
+=== Log Rotation Summary ===
+  Directory  : /var/log
+  Compressed : 0 file(s)
+  Deleted    : 0 file(s)
+[2026-06-21 07:07:59] === Log Rotation Complete ===
+[2026-06-21 07:07:59] ✔ Log rotation completed successfully.
+[2026-06-21 07:07:59] >>> Starting Backup: /var/log → /backups
+[2026-06-21 07:07:59] === Server Backup Started ===
+[2026-06-21 07:07:59] Creating archive: backup-2026-06-21.tar.gz
+✔ Archive verified: /backups/backup-2026-06-21.tar.gz
+  Size: 4.3M
+[2026-06-21 07:08:00] Removing backups older than 14 days from: /backups
+✔ Old backups deleted: 0
+=== Backup Summary ===
+  Source      : /var/log
+  Destination : /backups
+  Archive     : backup-2026-06-21.tar.gz
+  Size        : 4.3M
+[2026-06-21 07:08:00] === Backup Complete ===
+[2026-06-21 07:08:00] ✔ Backup completed successfully.
+[2026-06-21 07:08:00] === Maintenance Window Complete ===
+```
 
+### Error case (wrong directory)
+ 
 ```bash
 $ ./log_rotate.sh /nonexistent/path
 [ERROR] Directory '/nonexistent/path' does not exist. Exiting.
-
+ 
 $ echo $?
 1
 ```

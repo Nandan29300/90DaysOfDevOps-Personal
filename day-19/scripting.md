@@ -278,7 +278,7 @@ cleanup_old_backups() {
     while IFS= read -r -d '' file; do
         rm -f "$file"
         log "Removed old backup: $file"
-        ((count++))
+        ((count++)) || true
     done < <(find "$dest" -name "backup-*.tar.gz" -mtime +14 -print0)
 
     echo -e "${GREEN}✔ Old backups deleted: $count${NC}"

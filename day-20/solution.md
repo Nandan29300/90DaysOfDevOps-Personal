@@ -13,7 +13,6 @@ As a system administrator, analyzing log files daily is one of the most routine 
 
 # ============================================================
 #  log_analyzer.sh — Daily Log Analyzer & Report Generator
-#  Day 20 | 90DaysOfDevOps | @TrainWithShubham
 # ============================================================
 
 set -euo pipefail

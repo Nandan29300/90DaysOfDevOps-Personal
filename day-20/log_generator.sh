@@ -1,7 +1,5 @@
 #!/bin/bash
-
 # Usage: ./log_generator.sh <log_file_path> <num_lines>
-
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 <log_file_path> <num_lines>"
     exit 1
@@ -15,23 +13,49 @@ if [ -e "$log_file_path" ]; then
     exit 1
 fi
 
-# List of possible log message levels
-log_levels=("INFO" "DEBUG" "ERROR" "WARNING" "CRITICAL")
+log_levels=("INFO" "DEBUG" "ERROR" "WARNING" "CRITICAL" "Failed")
 
-# List of possible error messages
-error_messages=("Failed to connect" "Disk full" "Segmentation fault" "Invalid input" "Out of memory")
+error_messages=(
+    "Connection timed out"
+    "File not found"
+    "Permission denied"
+    "Disk I/O error"
+    "Out of memory"
+)
 
-# Function to generate a random log line
+critical_messages=(
+    "Disk space below threshold"
+    "Database connection lost"
+    "Memory usage exceeded 95%"
+    "Network interface eth1 down"
+)
+
+failed_messages=(
+    "Failed to authenticate user admin"
+    "Failed to start service nginx"
+    "Failed to mount /dev/sdc"
+)
+
 generate_log_line() {
     local log_level="${log_levels[$((RANDOM % ${#log_levels[@]}))]}"
-    local error_msg=""
+
     if [ "$log_level" == "ERROR" ]; then
-        error_msg="${error_messages[$((RANDOM % ${#error_messages[@]}))]}"
+        local msg="${error_messages[$((RANDOM % ${#error_messages[@]}))]}"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR $msg"
+
+    elif [ "$log_level" == "CRITICAL" ]; then
+        local msg="${critical_messages[$((RANDOM % ${#critical_messages[@]}))]}"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') CRITICAL $msg"
+
+    elif [ "$log_level" == "Failed" ]; then
+        local msg="${failed_messages[$((RANDOM % ${#failed_messages[@]}))]}"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') $msg"
+
+    else
+        echo "$(date '+%Y-%m-%d %H:%M:%S') $log_level System event $RANDOM"
     fi
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [$log_level] $error_msg - $RANDOM"
 }
 
-# Create the log file with random log lines
 touch "$log_file_path"
 for ((i=0; i<num_lines; i++)); do
     generate_log_line >> "$log_file_path"

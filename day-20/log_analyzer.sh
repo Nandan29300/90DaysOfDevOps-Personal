@@ -2,7 +2,6 @@
 
 # ============================================================
 #  log_analyzer.sh — Daily Log Analyzer & Report Generator
-#  Day 20 | 90DaysOfDevOps | @TrainWithShubham
 # ============================================================
 
 set -euo pipefail

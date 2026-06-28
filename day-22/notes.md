@@ -4,9 +4,9 @@
 
 ### Q1. What is the difference between `git add` and `git commit`?
 
-`git add` moves your changes into the **staging area** — it's like putting files in a box and saying "I want these in the next snapshot."
+`git add` moves your changes into the **staging area** - it's like putting files in a box and saying "I want these in the next snapshot."
 
-`git commit` actually **takes that snapshot** — it permanently saves everything in the staging area to the repo history with a message and timestamp.
+`git commit` actually **takes that snapshot** - it permanently saves everything in the staging area to the repo history with a message and timestamp.
 
 Think of it like this:
 - `git add` = putting items in a shopping cart
@@ -33,12 +33,12 @@ If Git committed everything directly on save, you'd end up with noisy, meaningle
 
 `git log` shows the full commit history of the repo. For each commit, it shows:
 
-- **Commit hash** — a unique 40-character SHA-1 ID (like a fingerprint for that commit)
-- **Author** — who made the commit (name + email from `git config`)
-- **Date** — when the commit was made
-- **Commit message** — what the commit does
+- **Commit hash** - a unique 40-character SHA-1 ID (like a fingerprint for that commit)
+- **Author** - who made the commit (name + email from `git config`)
+- **Date** - when the commit was made
+- **Commit message** - what the commit does
 
-`git log --oneline` gives you the short hash + message only — much cleaner for getting a quick overview.
+`git log --oneline` gives you the short hash + message only - much cleaner for getting a quick overview.
 
 ---
 
@@ -69,10 +69,10 @@ Working Directory   →  git add  →  Staging Area  →  git commit  →  Repos
 | Zone | What it is | Git command to move out of it |
 |---|---|---|
 | **Working Directory** | Files you see and edit on disk right now | `git add` |
-| **Staging Area** | A "pre-commit" holding zone — changes queued for the next commit | `git commit` |
-| **Repository** | Permanent history stored in `.git/` — all your commits | (already saved) |
+| **Staging Area** | A "pre-commit" holding zone - changes queued for the next commit | `git commit` |
+| **Repository** | Permanent history stored in `.git/` - all your commits | (already saved) |
 
 An analogy:
 - Working Directory = your **rough draft** on paper
 - Staging Area = **what you've marked to include** in the final version
-- Repository = **the published book** — permanent and versioned
+- Repository = **the published book** - permanent and versioned

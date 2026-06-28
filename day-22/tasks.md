@@ -288,8 +288,6 @@ b2c3d4e docs: add Viewing Changes section with diff, log, show commands
 a1b2c3d docs: add git-commands.md with setup and basic workflow commands
 ```
 
-> 📸 **Screenshot this output for your submission!**
-
 ---
 
 ### Check what changed between commits

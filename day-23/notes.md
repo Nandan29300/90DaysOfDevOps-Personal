@@ -12,6 +12,8 @@ Technically, `main` isn't special - it's just the default branch name Git gives 
 
 **Why this matters:** because branches are just pointers, you can create dozens of them without worrying about disk space or performance.
 
+---
+
 ### 2. Why do we use branches instead of committing everything to `main`?
 
 - **Isolation** – `main` stays stable and deployable at all times. Broken/half-finished work never touches it.
@@ -19,6 +21,8 @@ Technically, `main` isn't special - it's just the default branch name Git gives 
 - **Safe experimentation** – you can try a risky idea; if it fails, delete the branch and `main` is untouched.
 - **Clean history & review** – changes go through a branch → Pull Request → review → merge flow, so `main` gets an intentional, reviewed history instead of a messy stream of half-baked commits.
 - **Easy rollback** – if a feature breaks something, you just don't merge it (or you revert the merge commit) instead of untangling commits mixed into `main`.
+
+---
 
 ### 3. What is `HEAD` in Git?
 
@@ -35,6 +39,11 @@ HEAD → feature-1 → commit C4
 ```
 
 If you check out a specific commit hash directly (instead of a branch), you get a **"detached HEAD"** state - `HEAD` points straight at a commit instead of at a branch.
+
+Normal: HEAD → Branch → Latest Commit
+Detached HEAD: HEAD → Commit (no branch) ✅
+
+---
 
 ### 4. What happens to your files when you switch branches?
 

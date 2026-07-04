@@ -111,7 +111,7 @@ Steps performed:
 2. Connected the local repo to the GitHub remote:
 
 ```bash
-git remote add origin https://github.com/Nandan300/devops-git-practic.git
+git remote add origin https://github.com/Nandan300/devops-git-practice.git
 git remote -v     # verify the remote was added correctly
 ```
 

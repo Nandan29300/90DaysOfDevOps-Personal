@@ -143,6 +143,18 @@ origin    → https://github.com/Nandan29300/project.git   (your fork)
 upstream  → https://github.com/<original-owner>/project.git  (original repo)
 ```
 
+```
+Original Repo
+github.com/flutter/flutter
+        ↑
+     upstream
+
+Your Fork
+github.com/nandan/flutter
+        ↑
+      origin
+```
+
 ---
 
 ## Task 4: Pull from GitHub

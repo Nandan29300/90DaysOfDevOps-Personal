@@ -63,12 +63,17 @@
 
 ---
 
-## Branching Basics *(preview - Day 23)*
+## Branching commands added to `git-commands.md`
 
 | Command | What it does | Example |
 |---|---|---|
 | `git branch` | List all local branches | `git branch` |
 | `git branch <name>` | Create a new branch | `git branch feature-login` |
+| `git branch -a` | list all branches (local + remote) |
+| `git switch <name>` | switch to an existing branch |
+| `git switch -c <name>` | create a new branch and switch to it |
 | `git checkout <branch>` | Switch to an existing branch | `git checkout feature-login` |
 | `git checkout -b <name>` | Create and switch to a new branch in one step | `git checkout -b feature-login` |
+| `git branch -D <name> ` | force delete a branch
 | `git merge <branch>` | Merge another branch into the current one | `git merge feature-login` |
+```

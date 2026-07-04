@@ -63,7 +63,7 @@
 
 ---
 
-## Branching commands added to `git-commands.md`
+## Branching commands
 
 | Command | What it does | Example |
 |---|---|---|
@@ -76,4 +76,4 @@
 | `git checkout -b <name>` | Create and switch to a new branch in one step | `git checkout -b feature-login` |
 | `git branch -D <name> ` | force delete a branch
 | `git merge <branch>` | Merge another branch into the current one | `git merge feature-login` |
-```
+

@@ -6,12 +6,6 @@ You know how to branch and push to GitHub. Now it's time to learn how branches c
 
 ---
 
-## Expected Output
-- A markdown file: `day-24-notes.md` with your observations and answers
-- Continue updating `git-commands.md` in your `devops-git-practice` repo
-
----
-
 ## Challenge Tasks
 
 ### Task 1: Git Merge — Hands-On

@@ -77,3 +77,60 @@
 | `git branch -D <name> ` | force delete a branch
 | `git merge <branch>` | Merge another branch into the current one | `git merge feature-login` |
 
+---
+
+## Merging (Day 24)
+| Command | What it does | Example |
+|---|---|---|
+| `git merge <branch>` | Merge a branch into your current branch (fast-forward if no divergence, merge commit if diverged) | `git merge feature-login` |
+| `git merge --no-ff <branch>` | Force a merge commit even if a fast-forward is possible (keeps branch history visible) | `git merge --no-ff feature-login` |
+| `git merge --squash <branch>` | Combine all commits from a branch into one set of staged changes (you then commit manually) | `git merge --squash feature-profile` |
+| `git merge --abort` | Cancel a merge that has conflicts and go back to the pre-merge state | `git merge --abort` |
+| `git diff --name-only --diff-filter=U` | List files that currently have unresolved merge conflicts | `git diff --name-only --diff-filter=U` |
+
+---
+
+## Rebasing (Day 24)
+| Command | What it does | Example |
+|---|---|---|
+| `git rebase <branch>` | Replay your current branch's commits on top of another branch's latest commit | `git rebase main` |
+| `git rebase --continue` | Continue a rebase after resolving a conflict | `git rebase --continue` |
+| `git rebase --abort` | Cancel an in-progress rebase and return to the original state | `git rebase --abort` |
+| `git rebase --skip` | Skip the current conflicting commit during a rebase | `git rebase --skip` |
+| `git rebase -i <base>` | Interactive rebase — reorder, squash, edit, or drop commits | `git rebase -i HEAD~3` |
+
+---
+
+## Stashing (Day 24)
+| Command | What it does | Example |
+|---|---|---|
+| `git stash` | Save uncommitted changes (staged + unstaged) and clean the working directory | `git stash` |
+| `git stash push -m "msg"` | Stash changes with a custom descriptive message | `git stash push -m "wip dashboard"` |
+| `git stash list` | List all saved stashes | `git stash list` |
+| `git stash apply` | Re-apply the most recent stash but keep it in the list | `git stash apply` |
+| `git stash apply stash@{n}` | Re-apply a specific stash by index, keeping it in the list | `git stash apply stash@{1}` |
+| `git stash pop` | Re-apply the most recent stash AND remove it from the list | `git stash pop` |
+| `git stash drop stash@{n}` | Delete a specific stash without applying it | `git stash drop stash@{0}` |
+| `git stash clear` | Delete all stashes | `git stash clear` |
+| `git stash show -p stash@{n}` | View the diff contained in a specific stash | `git stash show -p stash@{0}` |
+
+---
+
+## Cherry-Picking (Day 24)
+| Command | What it does | Example |
+|---|---|---|
+| `git cherry-pick <hash>` | Apply one specific commit from another branch onto the current branch | `git cherry-pick d4e5f6g` |
+| `git cherry-pick <hash1> <hash2>` | Cherry-pick multiple specific commits at once | `git cherry-pick d4e5f6g h7i8j9k` |
+| `git cherry-pick --continue` | Continue a cherry-pick after resolving a conflict | `git cherry-pick --continue` |
+| `git cherry-pick --abort` | Cancel an in-progress cherry-pick | `git cherry-pick --abort` |
+
+---
+
+## Visualizing History (Day 24)
+| Command | What it does | Example |
+|---|---|---|
+| `git log --oneline --graph --all` | Visual graph of all branches and how/where they diverged or merged | `git log --oneline --graph --all` |
+| `git log` | Used to see the logs of git operations in detail | `git log` |
+| `git log --oneline` | To see the git logs in one line | `git log --oneline` |
+
+---

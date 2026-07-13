@@ -134,3 +134,34 @@
 | `git log --oneline` | To see the git logs in one line | `git log --oneline` |
 
 ---
+
+## Remote Commands (Day 25)
+| Command | What it does | Example |
+|---|---|---|
+| `git remote -v` | List remotes and their URLs (fetch + push) | `git remote -v` |
+| `git remote add <name> <url>` | Add a new remote | `git remote add origin https://github.com/user/repo.git` |
+| `git remote remove <name>` | Remove a configured remote | `git remote remove origin` |
+| `git push <remote> <branch>` | Push local branch commits to a remote | `git push origin main` |
+| `git push -u <remote> <branch>` | Push and set upstream tracking (so future `git push` alone works) | `git push -u origin feature-login` |
+| `git push origin --delete <branch>` | Delete a branch on the remote | `git push origin --delete old-feature` |
+| `git pull <remote> <branch>` | Fetch + merge remote changes into current branch | `git pull origin main` |
+| `git pull --rebase` | Fetch + rebase local commits on top of remote changes instead of merging | `git pull --rebase origin main` |
+| `git fetch` | Download remote commits/branches without merging into local branches | `git fetch origin` |
+| `git fetch --all` | Fetch from all configured remotes | `git fetch --all` |
+| `git clone <url>` | Clone a full remote repo (history + branches) to local | `git clone https://github.com/user/repo.git` |
+| Fork (GitHub UI) | Create your own copy of someone else's repo under your account, then clone your fork locally to work on it | Fork via GitHub → `git clone https://github.com/you/repo.git` |
+| `git remote add upstream <url>` | Track the original repo you forked from, to pull in its latest changes | `git remote add upstream https://github.com/original/repo.git` |
+
+---
+
+## Reset & Revert - Deep Dive (Day 25)
+
+| Command | What it does | Destructive? | Safe on shared branches? |
+|---|---|---|---|
+| `git reset --soft HEAD~1` | Moves HEAD back, keeps changes **staged** | No | No |
+| `git reset --mixed HEAD~1` (default) | Moves HEAD back, keeps changes in **working dir**, unstages them | No | No |
+| `git reset --hard HEAD~1` | Moves HEAD back, **wipes** staging + working dir | Yes | No |
+| `git revert <hash>` | Creates a **new commit** that undoes a target commit's changes | No | Yes |
+| `git reflog` | Shows history of everywhere HEAD has pointed — safety net to recover "lost" commits after a hard reset | — | — |
+
+---

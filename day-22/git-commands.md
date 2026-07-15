@@ -165,3 +165,82 @@
 | `git reflog` | Shows history of everywhere HEAD has pointed — safety net to recover "lost" commits after a hard reset | — | — |
 
 ---
+
+## GitHub CLI - Auth & Setup (Day 26)
+| Command | What it does | Example |
+|---|---|---|
+| `gh --version` | Check gh is installed and which version | `gh --version` |
+| `gh auth login` | Authenticate gh with a GitHub account (browser, token, or SSH flow) | `gh auth login` |
+| `gh auth status` | Verify login and see which account/scopes are active | `gh auth status` |
+| `gh auth switch` | Switch between multiple logged-in accounts | `gh auth switch` |
+| `gh auth logout` | Log out of a gh-authenticated account | `gh auth logout` |
+| `gh help` | Top-level help / list of command groups | `gh help` |
+| `gh <command> --help` | Help for a specific command | `gh pr create --help` |
+
+---
+
+## GitHub CLI - Repositories (Day 26)
+| Command | What it does | Example |
+|---|---|---|
+| `gh repo create <name> --public --add-readme` | Create a new GitHub repo from the terminal | `gh repo create day26-test-repo --public --add-readme` |
+| `gh repo create --source . --push` | Turn an existing local folder into a GitHub repo and push it | `gh repo create --source . --public --push` |
+| `gh repo clone <owner>/<repo>` | Clone a repo using gh (auth handled automatically) | `gh repo clone octocat/Hello-World` |
+| `gh repo view <owner>/<repo>` | View repo details in the terminal | `gh repo view octocat/Hello-World` |
+| `gh repo view --web` | Open the current/specified repo in the browser | `gh repo view --web` |
+| `gh repo list [owner]` | List repos you own (or another owner's) | `gh repo list --limit 50` |
+| `gh repo delete <owner>/<repo> --yes` | Delete a repo (irreversible — be careful) | `gh repo delete me/day26-test-repo --yes` |
+| `gh repo fork <owner>/<repo>` | Fork a repo from the terminal | `gh repo fork octocat/Hello-World --clone` |
+
+---
+
+## GitHub CLI - Issues (Day 26)
+| Command | What it does | Example |
+|---|---|---|
+| `gh issue create --title "..." --body "..." --label bug` | Create an issue with title, body, label | `gh issue create --title "Login bug" --body "..." --label bug` |
+| `gh issue list` | List open issues on the current repo | `gh issue list --state open` |
+| `gh issue view <number>` | View a specific issue | `gh issue view 12` |
+| `gh issue close <number>` | Close an issue | `gh issue close 12` |
+| `gh issue reopen <number>` | Reopen a closed issue | `gh issue reopen 12` |
+| `gh issue list --json number,title,labels` | Get machine-readable issue data for scripting | `gh issue list --json number,title --jq '.[].title'` |
+
+---
+
+## GitHub CLI - Pull Requests (Day 26)
+| Command | What it does | Example |
+|---|---|---|
+| `gh pr create --fill` | Create a PR, auto-filling title/body from commits | `gh pr create --fill` |
+| `gh pr create --title "..." --body "..."` | Create a PR with custom title/body | `gh pr create --title "Add feature" --body "Details..."` |
+| `gh pr list` | List open PRs on the current repo | `gh pr list` |
+| `gh pr view <number>` | View a PR's details, reviewers, status | `gh pr view 5` |
+| `gh pr checks <number>` | View CI/status check results for a PR | `gh pr checks 5` |
+| `gh pr checkout <number>` | Check out a PR's branch locally to test it | `gh pr checkout 5` |
+| `gh pr diff <number>` | View a PR's diff in the terminal | `gh pr diff 5` |
+| `gh pr review <number> --approve -b "msg"` | Approve a PR with a comment | `gh pr review 5 --approve -b "LGTM"` |
+| `gh pr review <number> --request-changes -b "msg"` | Request changes on a PR | `gh pr review 5 --request-changes -b "Needs tests"` |
+| `gh pr merge <number> --squash --delete-branch` | Merge a PR and delete its branch | `gh pr merge 5 --squash --delete-branch` |
+
+---
+
+## GitHub CLI - Actions & Workflows (Day 26 preview)
+| Command | What it does | Example |
+|---|---|---|
+| `gh run list` | List recent workflow runs on a repo | `gh run list --repo cli/cli` |
+| `gh run view <run-id>` | View the status/summary of a specific run | `gh run view 123456` |
+| `gh run view <run-id> --log-failed` | View logs of just the failed steps | `gh run view 123456 --log-failed` |
+| `gh run watch` | Live-stream a run's status until it finishes | `gh run watch` |
+| `gh run rerun <run-id> --failed` | Re-run only the failed jobs of a run | `gh run rerun 123456 --failed` |
+| `gh workflow list` | List workflows defined in a repo | `gh workflow list` |
+| `gh workflow run <name>` | Manually trigger a `workflow_dispatch` workflow | `gh workflow run deploy.yml -f env=staging` |
+
+---
+
+## GitHub CLI - Extra Tricks (Day 26)
+| Command | What it does | Example |
+|---|---|---|
+| `gh api <endpoint>` | Make a raw GitHub API call (auth handled automatically) | `gh api repos/octocat/Hello-World` |
+| `gh gist create <file> --public` | Create a Gist from a local file | `gh gist create notes.md --public` |
+| `gh release create <tag> --notes "..."` | Create a tagged GitHub release | `gh release create v1.0.0 --notes "First release"` |
+| `gh alias set <name> '<command>'` | Create a shortcut for a frequently used command | `gh alias set prs 'pr list --author @me'` |
+| `gh search repos "<query>" --language=<lang>` | Search GitHub repos from the terminal | `gh search repos "devops" --language=python --stars=">100"` |
+
+---

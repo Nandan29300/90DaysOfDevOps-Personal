@@ -6,7 +6,7 @@
 
 ---
 
-# 📌 What is a Docker Image?
+#  What is a Docker Image?
 
 A **Docker Image** is a **read-only blueprint** used to create Docker containers.
 
@@ -38,7 +38,7 @@ nginx image
 
 ---
 
-# 📌 What is a Docker Container?
+#  What is a Docker Container?
 
 A **Docker Container** is a **running instance of an image**.
 
@@ -125,6 +125,8 @@ Approximate Size:
 ---
 
 ### Why is Alpine Smaller?
+
+Alpine uses the musl C library and BusyBox utilities, while Ubuntu uses the glibc C library and GNU utilities, making Ubuntu larger but more compatible with many applications.
 
 Because Alpine contains only the essential components required to run Linux applications.
 
@@ -609,7 +611,7 @@ docker system prune -a
 
 ---
 
-# 📌 How Docker Images and Containers Work Internally
+#  How Docker Images and Containers Work Internally
 
 A Docker **Image** is **read-only**. Once an image is built, its layers cannot be modified.
 
@@ -638,7 +640,7 @@ If the container is removed, everything stored in its writable layer is also rem
 
 ---
 
-# 📌 What is Union File System (UnionFS)?
+#  What is Union File System (UnionFS)?
 
 Docker uses a **Union File System (UnionFS)** to combine multiple read-only image layers and a single writable container layer into one unified filesystem.
 

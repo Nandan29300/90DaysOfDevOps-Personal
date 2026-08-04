@@ -21,10 +21,12 @@ It contains everything required to run an application:
 
 Think of it like:
 
-- 📷 **Image = Photo**
-- 🚀 **Container = Running Person in the Photo**
+- 🏗️ **Image = Blueprint**
+- 🏠 **Container = House built from that blueprint**
 
-One image can create multiple containers.
+One blueprint can be used to build many houses.
+Similarly, one Docker image can create multiple containers.
+Changes made inside one house (container) do not modify the original blueprint (image).
 
 Example:
 

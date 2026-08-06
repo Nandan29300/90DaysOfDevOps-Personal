@@ -4,52 +4,121 @@
 
 ---
 
+## Table of Contents
+
+- [What is a Dockerfile?](#what-is-a-dockerfile)
+- [Why Use Dockerfiles?](#why-use-dockerfiles)
+- [Docker Build Workflow](#docker-build-workflow)
+- [Task 1 - Your First Dockerfile](#task-1---your-first-dockerfile)
+- [Understanding Build Context](#understanding-build-context)
+
+---
+
 # What is a Dockerfile?
 
-A **Dockerfile** is a text file that contains instructions for Docker to automatically build an image.
+A **Dockerfile** is a text file that contains a series of instructions used by Docker to automatically build a Docker image.
 
-Instead of manually installing packages and configuring everything every time, we simply write the steps once inside a Dockerfile.
+Instead of manually installing software, copying files, and configuring environments every time, we write those steps once inside a Dockerfile. Docker then follows those instructions exactly, making image creation automatic and repeatable.
 
-Think of it as:
-
-```
-Recipe → Dockerfile
-Cake → Docker Image
-Eating the Cake → Running Container
-```
-
-Benefits:
-
-- Reproducible builds
-- Version controlled
-- Easy deployment
-- Same environment everywhere
-- Automation friendly
+Think of a Dockerfile as the **blueprint** for creating Docker images.
 
 ---
 
-## Docker Build Flow
+## Real-Life Analogy
 
 ```
+Recipe
+   │
+   ▼
 Dockerfile
-     │
-     ▼
-docker build
-     │
-     ▼
- Docker Image
-     │
-docker run
-     │
-     ▼
- Running Container
+
+Cake
+   │
+   ▼
+Docker Image
+
+Eating the Cake
+   │
+   ▼
+Running Container
 ```
+
+Just as a recipe tells a chef how to prepare a dish, a Dockerfile tells Docker how to build an image.
 
 ---
 
-## Task 1 - Your First Dockerfile
+## Why Use Dockerfiles?
 
-### Folder Structure
+Without Dockerfiles:
+
+- Install software manually
+- Copy project files manually
+- Configure the environment manually
+- Easy to make mistakes
+- Difficult to reproduce
+
+With Dockerfiles:
+
+- Automated image creation
+- Reproducible builds
+- Easy collaboration
+- Version controlled
+- Works the same everywhere
+- Perfect for CI/CD pipelines
+
+---
+
+## Benefits of Dockerfiles
+
+- Infrastructure as Code (IaC)
+- Consistent environments
+- Faster deployments
+- Easy image versioning
+- Easy sharing through Docker Hub
+- Simple maintenance
+- Supports build caching
+- Reduces manual work
+
+---
+
+# Docker Build Workflow
+
+Whenever you build a Docker image, Docker follows this workflow.
+
+```
+             Dockerfile
+                  │
+                  ▼
+         docker build
+                  │
+                  ▼
+          Docker Image
+                  │
+          docker run
+                  │
+                  ▼
+        Running Container
+```
+
+### Explanation
+
+1. Write instructions inside a Dockerfile.
+2. Run `docker build`.
+3. Docker creates an image.
+4. Run the image using `docker run`.
+5. Docker creates and starts a container.
+
+---
+
+# Task 1 - Your First Dockerfile
+
+## Objective
+
+Create your first custom Docker image using Ubuntu as the base image.
+
+---
+
+## Folder Structure
 
 ```
 my-first-image/
@@ -59,7 +128,7 @@ my-first-image/
 
 ---
 
-### Dockerfile
+## Dockerfile
 
 ```Dockerfile
 FROM ubuntu:latest
@@ -71,121 +140,317 @@ CMD echo "Hello from my custom image!"
 
 ---
 
-### Explanation
+## Understanding Each Instruction
 
-#### FROM
+### 1. FROM
 
-Selects the base image.
-
-```
+```Dockerfile
 FROM ubuntu:latest
 ```
 
-Docker downloads Ubuntu (if not already available) and starts building from it.
+The `FROM` instruction specifies the **base image**.
+
+Everything in your image starts from this image.
+
+Docker first checks whether the image exists locally.
+
+If not, Docker downloads it automatically.
+
+Think of it as:
+
+```
+Your Image
+
+        built on top of
+
+Ubuntu Image
+```
 
 ---
 
-#### RUN
+### 2. RUN
 
-Executes commands while building the image.
-
-```
+```Dockerfile
 RUN apt-get update && apt-get install -y curl
 ```
 
-This installs curl permanently into the image.
+The `RUN` instruction executes commands **while building the image**.
+
+Here it performs two operations:
+
+- Updates Ubuntu package lists.
+- Installs the `curl` package.
+
+Once the image is built, `curl` becomes a permanent part of the image.
+
+**Note**
+
+`RUN` executes only during image creation.
+
+It does **not** execute every time a container starts.
 
 ---
 
-#### CMD
+### 3. CMD
 
-Default command executed when the container starts.
-
-```
+```Dockerfile
 CMD echo "Hello from my custom image!"
 ```
 
+`CMD` defines the default command executed whenever a container starts.
+
+Unlike `RUN`, this instruction executes **when the container runs**, not during image creation.
+
 ---
 
-### Build Image
+## Build the Image
+
+Navigate to the project folder.
 
 ```bash
 cd my-first-image
+```
 
+Build the image.
+
+```bash
 docker build -t my-ubuntu:v1 .
 ```
 
-Explanation
+---
 
-```
-docker build
-```
+## Command Breakdown
 
-Creates an image.
-
-```
--t
-```
-
-Assigns a tag.
-
-```
-my-ubuntu:v1
-```
-
-Image name and version.
-
-```
-.
-```
-
-Current directory as build context.
+| Part | Description |
+|------|-------------|
+| `docker build` | Builds an image from a Dockerfile |
+| `-t` | Assigns a name and tag |
+| `my-ubuntu:v1` | Image name and version |
+| `.` | Uses the current directory as the build context |
 
 ---
 
-### Run Container
+## What Happens During Build?
+
+Docker performs these steps:
+
+```
+Step 1
+Read Dockerfile
+
+        │
+        ▼
+
+Step 2
+Download Ubuntu Image
+(if required)
+
+        │
+        ▼
+
+Step 3
+Run apt-get update
+
+        │
+        ▼
+
+Step 4
+Install curl
+
+        │
+        ▼
+
+Step 5
+Save Image
+
+        │
+        ▼
+
+Finished
+```
+
+Every instruction creates a new **image layer**.
+
+These layers are cached for faster future builds.
+
+---
+
+## Verify the Image
+
+List all Docker images.
+
+```bash
+docker images
+```
+
+Example:
+
+```text
+REPOSITORY    TAG    IMAGE ID       CREATED
+my-ubuntu     v1     xxxxxxxxxxxx   2 minutes ago
+```
+
+---
+
+## Run the Container
 
 ```bash
 docker run --rm my-ubuntu:v1
 ```
 
-Output
+---
 
-```
-Hello from my custom image!
-```
+## Command Breakdown
+
+| Part | Description |
+|------|-------------|
+| `docker run` | Creates and starts a container |
+| `--rm` | Automatically removes the container after exit |
+| `my-ubuntu:v1` | Image to execute |
 
 ---
 
-## Understanding Build Context
+## Expected Output
 
-When running
+```text
+Hello from my custom image!
+```
+
+Congratulations! 🎉
+
+You have successfully built and executed your first custom Docker image.
+
+---
+
+# Understanding Build Context
+
+One of the most important Docker concepts is the **Build Context**.
+
+Whenever you execute:
 
 ```bash
 docker build .
 ```
 
-Docker sends the **current directory** to the Docker daemon.
+Docker sends the current directory to the Docker daemon.
 
 That directory is called the **Build Context**.
 
 ```
 Project Folder
-      │
-      ▼
-Docker Build Context
-      │
-      ▼
+│
+├── Dockerfile
+├── app.py
+├── requirements.txt
+├── README.md
+└── images/
+
+        │
+
+docker build .
+
+        │
+
+        ▼
+
 Docker Daemon
 ```
 
-Everything inside the build context can be copied into the image.
+Everything inside the build context can be accessed using instructions like:
+
+```Dockerfile
+COPY
+```
+
+or
+
+```Dockerfile
+ADD
+```
 
 ---
 
-## Task 2 - Dockerfile Instructions
+## Why Does Build Context Matter?
 
-Folder
+If your project contains unnecessary files, Docker sends all of them during every build.
+
+Large folders such as:
+
+- node_modules
+- .git
+- videos
+- logs
+- screenshots
+
+can make builds slower.
+
+This is exactly why `.dockerignore` exists.
+
+We'll learn about it later in this guide.
+
+---
+
+## Build Context Example
+
+Suppose your project looks like this:
+
+```
+project/
+
+├── Dockerfile
+├── main.py
+├── config.json
+├── README.md
+├── .env
+├── .git/
+└── node_modules/
+```
+
+Running:
+
+```bash
+docker build .
+```
+
+sends **everything** to Docker unless ignored.
+
+Later, using a `.dockerignore` file, Docker will skip unnecessary files before sending the build context.
+
+This results in:
+
+- Faster builds
+- Smaller build context
+- Better security
+- Reduced network transfer
+- Improved CI/CD performance
+
+---
+
+## Key Points
+
+- A Dockerfile is a blueprint for building Docker images.
+- Docker executes Dockerfile instructions from top to bottom.
+- `FROM` specifies the base image.
+- `RUN` executes commands during image creation.
+- `CMD` defines the default command when a container starts.
+- Every Dockerfile instruction creates a new image layer.
+- Docker caches layers to speed up future builds.
+- The current directory becomes the build context when running `docker build .`.
+- Build context includes every file unless excluded using `.dockerignore`.
+
+---
+
+---
+
+# Task 2 - Understanding Dockerfile Instructions
+
+## Objective
+
+Learn the purpose of the most commonly used Dockerfile instructions and understand how they work together to create a Docker image.
+
+---
+
+## Folder Structure
 
 ```
 sample-all-instructions/
@@ -196,23 +461,31 @@ sample-all-instructions/
 
 ---
 
-### Dockerfile
+## Dockerfile
 
 ```Dockerfile
+# Use official Python image as base image
 FROM python:3.11-slim
 
+# Set the working directory
 WORKDIR /app
 
+# Copy application source code
 COPY main.py .
 
+# Install dependencies if required
+# RUN pip install flask
+
+# Document the application's port
 EXPOSE 5000
 
+# Default command
 CMD ["python", "main.py"]
 ```
 
 ---
 
-### main.py
+## main.py
 
 ```python
 print("Hello from a Dockerfile using all instructions!")
@@ -220,33 +493,62 @@ print("Hello from a Dockerfile using all instructions!")
 
 ---
 
-### Build
+## Build the Image
 
 ```bash
+cd sample-all-instructions
+
 docker build -t all-instructions:v1 .
 ```
 
 ---
 
-### Run
+## Run the Container
 
 ```bash
 docker run --rm all-instructions:v1
 ```
 
-Output
+---
 
-```
+## Expected Output
+
+```text
 Hello from a Dockerfile using all instructions!
 ```
 
 ---
 
-## Dockerfile Instructions Explained
+# Understanding Dockerfile Instructions
 
-### FROM
+Docker reads every instruction from **top to bottom**.
 
-Specifies the base image.
+Each instruction creates a **new image layer**.
+
+```
+Dockerfile
+     │
+     ▼
+Instruction 1
+     │
+Instruction 2
+     │
+Instruction 3
+     │
+Instruction 4
+     │
+Finished Image
+```
+
+---
+
+## 1. FROM
+
+### Syntax
+
+```Dockerfile
+FROM image:tag
+```
 
 Example
 
@@ -254,87 +556,342 @@ Example
 FROM python:3.11-slim
 ```
 
-Everything begins from this image.
+### Purpose
+
+The `FROM` instruction specifies the **base image**.
+
+Every Dockerfile **must begin with a FROM instruction** (except advanced multi-stage builds).
+
+Docker builds everything on top of this image.
+
+```
+Your Image
+      ▲
+      │
+Python Image
+      ▲
+      │
+Linux OS
+```
+
+### Common Examples
+
+```Dockerfile
+FROM ubuntu:latest
+```
+
+```Dockerfile
+FROM nginx:alpine
+```
+
+```Dockerfile
+FROM node:22
+```
+
+```Dockerfile
+FROM python:3.11-slim
+```
+
+### Best Practice
+
+Prefer smaller images whenever possible.
+
+Good
+
+```Dockerfile
+FROM python:3.11-slim
+```
+
+Better
+
+```Dockerfile
+FROM alpine
+```
+
+Smaller images mean:
+
+- Faster downloads
+- Smaller storage usage
+- Better security
+- Faster deployments
 
 ---
 
-### WORKDIR
+## 2. WORKDIR
 
-Sets the working directory inside the container.
+### Syntax
 
 ```Dockerfile
 WORKDIR /app
 ```
 
-Instead of repeatedly writing
+### Purpose
 
-```bash
-cd /app
+Sets the default working directory inside the container.
+
+Without WORKDIR
+
+```Dockerfile
+COPY main.py /app/main.py
+
+RUN cd /app && python main.py
 ```
 
-Docker automatically executes future instructions from this directory.
+With WORKDIR
+
+```Dockerfile
+WORKDIR /app
+
+COPY main.py .
+
+CMD ["python","main.py"]
+```
+
+Everything automatically executes inside `/app`.
 
 ---
 
-### COPY
+### Example
 
-Copies files from the host machine into the image.
+```
+Container
+
+/
+
+├── bin
+├── usr
+├── etc
+└── app
+      │
+      ├── main.py
+      └── requirements.txt
+```
+
+Docker automatically starts from `/app`.
+
+---
+
+## 3. COPY
+
+### Syntax
+
+```Dockerfile
+COPY <source> <destination>
+```
+
+Example
 
 ```Dockerfile
 COPY main.py .
 ```
 
-Equivalent to
+or
+
+```Dockerfile
+COPY . .
+```
+
+---
+
+### Purpose
+
+Copies files from your local machine into the Docker image.
 
 ```
-Host
+Local Machine
+
 main.py
-↓
-Container
+
+        │
+
+COPY
+
+        ▼
+
+Docker Image
+
 /app/main.py
 ```
 
 ---
 
-### RUN
+### Common Examples
 
-Executes commands while building the image.
+Copy one file
+
+```Dockerfile
+COPY app.py .
+```
+
+Copy multiple files
+
+```Dockerfile
+COPY requirements.txt .
+```
+
+Copy entire project
+
+```Dockerfile
+COPY . .
+```
+
+---
+
+### Important Note
+
+`COPY . .`
+
+means
+
+```
+Current Folder
+
+↓
+
+Current Working Directory
+```
+
+This is one of the most frequently used Dockerfile instructions.
+
+---
+
+## 4. RUN
+
+### Syntax
+
+```Dockerfile
+RUN command
+```
 
 Example
+
+```Dockerfile
+RUN apt-get update
+```
+
+or
 
 ```Dockerfile
 RUN pip install flask
 ```
 
-Runs only during image creation.
+---
+
+### Purpose
+
+Executes commands while building the image.
+
+These commands execute **only once during build**.
+
+Example
+
+```Dockerfile
+RUN mkdir logs
+```
+
+The `logs` folder becomes part of the final image.
 
 ---
 
-### EXPOSE
+### Common Uses
 
-Documents which port the application uses.
+Installing packages
+
+```Dockerfile
+RUN apt-get install curl
+```
+
+Installing Python libraries
+
+```Dockerfile
+RUN pip install flask
+```
+
+Creating directories
+
+```Dockerfile
+RUN mkdir uploads
+```
+
+Changing permissions
+
+```Dockerfile
+RUN chmod +x script.sh
+```
+
+---
+
+### RUN vs CMD
+
+| RUN | CMD |
+|------|------|
+| Runs during image build | Runs when container starts |
+| Creates image layers | Does not create build layers |
+| Used for installation | Used to start applications |
+
+---
+
+## 5. EXPOSE
+
+### Syntax
 
 ```Dockerfile
 EXPOSE 5000
 ```
 
-Important:
+---
 
-It **does NOT** publish the port.
+### Purpose
 
-Port publishing happens with
+Documents which port the application uses.
+
+It **does not actually publish the port**.
+
+Think of it as documentation for anyone using the image.
+
+---
+
+### Important
+
+This
+
+```Dockerfile
+EXPOSE 5000
+```
+
+does NOT make the application available.
+
+You still need
 
 ```bash
-docker run -p
+docker run -p 5000:5000 image-name
 ```
 
 ---
 
-### CMD
+### Flow
 
-Specifies the default command executed when the container starts.
+```
+Application
 
-Example
+↓
+
+Port 5000
+
+↓
+
+EXPOSE 5000
+
+↓
+
+docker run -p 5000:5000
+```
+
+---
+
+## 6. CMD
+
+### Syntax
 
 ```Dockerfile
 CMD ["python","main.py"]
@@ -342,33 +899,115 @@ CMD ["python","main.py"]
 
 ---
 
-## Dockerfile Lifecycle
+### Purpose
+
+Defines the default command executed when the container starts.
+
+Only one CMD should exist.
+
+If multiple CMD instructions exist,
+
+Docker only uses the **last one**.
+
+---
+
+### Examples
+
+```Dockerfile
+CMD ["python","main.py"]
+```
+
+```Dockerfile
+CMD ["npm","start"]
+```
+
+```Dockerfile
+CMD ["nginx","-g","daemon off;"]
+```
+
+---
+
+# Dockerfile Execution Order
+
+Docker processes instructions from top to bottom.
 
 ```
 FROM
+
 ↓
+
 WORKDIR
+
 ↓
+
 COPY
+
 ↓
+
 RUN
+
 ↓
+
 EXPOSE
+
 ↓
+
 CMD
 ```
 
----
-
-## Task 3 - CMD vs ENTRYPOINT
-
-Understanding this difference is very important.
+Every instruction creates a new cached layer except metadata-only instructions where applicable.
 
 ---
 
-### CMD Example
+# Image Layers
 
-Dockerfile
+Imagine the image like this:
+
+```
+┌───────────────────────────┐
+│ CMD                       │
+├───────────────────────────┤
+│ EXPOSE                    │
+├───────────────────────────┤
+│ RUN                       │
+├───────────────────────────┤
+│ COPY                      │
+├───────────────────────────┤
+│ WORKDIR                   │
+├───────────────────────────┤
+│ Base Image                │
+└───────────────────────────┘
+```
+
+When Docker rebuilds,
+
+it checks each layer one by one.
+
+If nothing changed,
+
+Docker reuses the cached layer.
+
+---
+
+# Task 3 - CMD vs ENTRYPOINT
+
+This is one of the most commonly asked Docker interview topics.
+
+Although they look similar,
+
+they serve different purposes.
+
+---
+
+## CMD
+
+CMD specifies the **default command** executed when a container starts.
+
+Users can override it.
+
+---
+
+### Dockerfile
 
 ```Dockerfile
 FROM alpine
@@ -376,13 +1015,17 @@ FROM alpine
 CMD ["echo","hello"]
 ```
 
-Build
+---
+
+### Build
 
 ```bash
 docker build -t cmdtest .
 ```
 
-Run
+---
+
+### Run
 
 ```bash
 docker run --rm cmdtest
@@ -390,11 +1033,13 @@ docker run --rm cmdtest
 
 Output
 
-```
+```text
 hello
 ```
 
-Override CMD
+---
+
+### Override CMD
 
 ```bash
 docker run --rm cmdtest echo world
@@ -402,17 +1047,27 @@ docker run --rm cmdtest echo world
 
 Output
 
-```
+```text
 world
 ```
 
-Docker completely replaces CMD.
+Docker completely replaces the CMD instruction.
 
 ---
 
-### ENTRYPOINT Example
+## ENTRYPOINT
 
-Dockerfile
+ENTRYPOINT specifies the application's main executable.
+
+Users cannot replace it accidentally.
+
+Instead,
+
+extra arguments are appended.
+
+---
+
+### Dockerfile
 
 ```Dockerfile
 FROM alpine
@@ -420,13 +1075,17 @@ FROM alpine
 ENTRYPOINT ["echo"]
 ```
 
-Build
+---
+
+### Build
 
 ```bash
 docker build -t entrytest .
 ```
 
-Run
+---
+
+### Run
 
 ```bash
 docker run --rm entrytest hello
@@ -434,11 +1093,13 @@ docker run --rm entrytest hello
 
 Output
 
-```
+```text
 hello
 ```
 
-Run
+---
+
+### Run Again
 
 ```bash
 docker run --rm entrytest world foo
@@ -446,50 +1107,149 @@ docker run --rm entrytest world foo
 
 Output
 
-```
+```text
 world foo
 ```
 
-ENTRYPOINT always executes.
-
-Additional arguments are appended.
+Docker automatically appends the arguments after ENTRYPOINT.
 
 ---
 
-## CMD vs ENTRYPOINT
+# CMD vs ENTRYPOINT
 
-| CMD | ENTRYPOINT |
-|------|------------|
-| Default command | Fixed executable |
-| Can be overridden | Cannot be replaced easily |
-| Flexible | Consistent |
-| Best for default behavior | Best for main application |
-
----
-
-## When Should You Use Them?
-
-Use CMD
-
-- Python scripts
-- Development containers
-- Base images
-- Flexible execution
-
-Use ENTRYPOINT
-
-- Production applications
-- Wrapper scripts
-- Utility containers
-- CLI tools
+| Feature | CMD | ENTRYPOINT |
+|----------|-----|------------|
+| Purpose | Default command | Main executable |
+| Can be overridden | Yes | No (without `--entrypoint`) |
+| User flexibility | High | Low |
+| Common use | Development | Production |
+| Additional arguments | Replace CMD | Appended to ENTRYPOINT |
 
 ---
 
-## Task 4 - Build a Simple Website
+## Using CMD and ENTRYPOINT Together
 
-Folder
+They can work together.
 
+Example
+
+```Dockerfile
+FROM python:3.11-slim
+
+ENTRYPOINT ["python"]
+
+CMD ["main.py"]
 ```
+
+Running
+
+```bash
+docker run myimage
+```
+
+becomes
+
+```bash
+python main.py
+```
+
+Running
+
+```bash
+docker run myimage app.py
+```
+
+becomes
+
+```bash
+python app.py
+```
+
+ENTRYPOINT remains fixed,
+
+while CMD provides default arguments.
+
+---
+
+# When Should You Use CMD?
+
+Use CMD when:
+
+- Users should be able to override the command.
+- Building development containers.
+- Creating flexible base images.
+- Running scripts.
+
+Examples
+
+- Python
+- Node.js
+- Java
+- Testing containers
+
+---
+
+# When Should You Use ENTRYPOINT?
+
+Use ENTRYPOINT when:
+
+- The application must always start.
+- Building CLI tools.
+- Creating wrapper scripts.
+- Running production services.
+
+Examples
+
+- Nginx
+- Redis
+- MySQL
+- PostgreSQL
+
+---
+
+## Interview Tip
+
+A common interview question is:
+
+**What is the difference between RUN, CMD and ENTRYPOINT?**
+
+A simple answer is:
+
+- **RUN** executes during image build.
+- **CMD** provides the default command when the container starts.
+- **ENTRYPOINT** defines the fixed executable that always runs.
+
+---
+
+## Key Points
+
+- Every Dockerfile starts with a `FROM` instruction.
+- `WORKDIR` avoids repeatedly using `cd`.
+- `COPY` moves files from the host to the image.
+- `RUN` executes commands while building the image.
+- `EXPOSE` documents the application's port.
+- `CMD` defines the default startup command.
+- `ENTRYPOINT` defines the application's main executable.
+- Docker executes Dockerfile instructions from top to bottom.
+- Each instruction creates a cached image layer.
+
+---
+
+---
+
+# Task 4 - Build a Simple Web App Image
+
+## Objective
+
+Let's build a simple static website and serve it using the official **Nginx Docker image**.
+
+This demonstrates how Docker can package and run a web server with your own website.
+
+---
+
+## Folder Structure
+
+```text
 simple-website/
 │
 ├── Dockerfile
@@ -498,24 +1258,24 @@ simple-website/
 
 ---
 
-### index.html
+## index.html
 
 ```html
 <!DOCTYPE html>
 <html>
 <head>
-<title>My Website</title>
+    <title>My Website</title>
 </head>
 
 <body>
-<h1>Welcome to my custom Dockerized website!</h1>
+    <h1>Welcome to my custom Dockerized website!</h1>
 </body>
 </html>
 ```
 
 ---
 
-### Dockerfile
+## Dockerfile
 
 ```Dockerfile
 FROM nginx:alpine
@@ -525,55 +1285,101 @@ COPY index.html /usr/share/nginx/html/index.html
 
 ---
 
-### Build
+## Build the Image
 
 ```bash
+cd simple-website
+
 docker build -t my-website:v1 .
 ```
 
 ---
 
-### Run
+## Run the Container
 
 ```bash
 docker run --rm -p 8080:80 my-website:v1
 ```
 
-Visit
+---
+
+## Command Breakdown
+
+| Command | Description |
+|----------|-------------|
+| `docker run` | Creates and starts a container |
+| `--rm` | Removes the container after exit |
+| `-p 8080:80` | Maps port 8080 on the host to port 80 inside the container |
+| `my-website:v1` | Image name |
+
+---
+
+## Test the Website
+
+Open your browser.
 
 ```
 http://localhost:8080
 ```
 
-You should see your custom webpage.
+You should see
+
+```
+Welcome to my custom Dockerized website!
+```
 
 ---
 
-## How Nginx Serves the Website
+# How Nginx Serves the Website
 
 ```
 Browser
-↓
+     │
+     ▼
 localhost:8080
-↓
-Docker Port Mapping
-↓
+     │
+     ▼
+Host Port 8080
+     │
+docker -p
+     │
+     ▼
 Container Port 80
-↓
-Nginx
-↓
+     │
+     ▼
+Nginx Server
+     │
+     ▼
 index.html
 ```
 
 ---
 
-## Task 5 - .dockerignore
+## Why Use Nginx?
 
-Similar to `.gitignore`, Docker also supports ignoring files.
+Nginx is
+
+- Lightweight
+- Fast
+- Stable
+- Production ready
+- Excellent for serving static websites
+
+That's why the official Docker image is widely used.
 
 ---
 
-### .dockerignore
+# Task 5 - .dockerignore
+
+## What is .dockerignore?
+
+A `.dockerignore` file tells Docker which files and folders should **not** be sent as part of the build context.
+
+It works similarly to `.gitignore`.
+
+---
+
+## Example
 
 ```text
 node_modules
@@ -582,29 +1388,58 @@ node_modules
 .env
 ```
 
-These files are excluded from the build context.
-
 ---
 
 ## Why Use .dockerignore?
 
-Benefits
+Without `.dockerignore`
 
-- Faster builds
-- Smaller images
-- Better security
-- Cleaner Docker context
+```
+docker build .
 
-Never include
+↓
 
+Everything is sent
+
+↓
+
+Docker Daemon
+```
+
+Including
+
+- README files
 - Git history
-- Secrets
 - Environment files
-- Large dependency folders
+- Logs
+- node_modules
 
 ---
 
-## Build
+With `.dockerignore`
+
+```
+docker build .
+
+↓
+
+Only required files
+
+↓
+
+Docker Daemon
+```
+
+Result
+
+- Faster builds
+- Smaller build context
+- Better security
+- Smaller images
+
+---
+
+## Build the Image
 
 ```bash
 docker build -t ignore-test:v1 .
@@ -618,45 +1453,85 @@ docker build -t ignore-test:v1 .
 docker run --rm ignore-test:v1 find /usr/share/nginx/html/
 ```
 
-README.md, .git, .env and node_modules should not appear if they exist in your project.
+If your project contained
+
+- README.md
+- .env
+- .git
+- node_modules
+
+they should **not** appear inside the image.
 
 ---
 
-## Task 6 - Build Optimization and Cache
+## Best Practices
 
-Docker builds images layer by layer.
+Always ignore
 
-Each instruction creates a layer.
+```text
+.git
+.env
+node_modules
+coverage
+dist
+build
+*.log
+*.md
+.vscode
+.idea
+```
+
+---
+
+# Task 6 - Build Optimization & Cache
+
+One of Docker's biggest advantages is **Layer Caching**.
+
+---
+
+## How Docker Builds Images
+
+Docker executes every instruction one by one.
 
 ```
 FROM
-↓
+   │
+   ▼
 WORKDIR
-↓
+   │
+   ▼
 COPY
-↓
+   │
+   ▼
 RUN
-↓
+   │
+   ▼
 CMD
 ```
 
-Each layer is cached.
+Each instruction creates a **new image layer**.
 
 ---
 
-### Poor Dockerfile
+## What is Docker Cache?
 
-```Dockerfile
-COPY . .
+Suppose you build an image today.
 
-RUN pip install -r requirements.txt
-```
+Tomorrow you build the same Dockerfile again.
 
-Every source code change forces dependencies to reinstall.
+Docker notices that nothing changed.
+
+Instead of rebuilding everything,
+
+it reuses previously built layers.
+
+This is called **Layer Cache**.
 
 ---
 
-### Better Dockerfile
+## Example
+
+Dockerfile
 
 ```Dockerfile
 FROM python:3.11-slim
@@ -672,132 +1547,390 @@ COPY . .
 CMD ["python","main.py"]
 ```
 
-Now Docker reuses cached dependency layers.
+---
 
-Only the application code layer rebuilds.
+### First Build
 
-Result:
+```
+FROM
 
-- Faster builds
-- Less network usage
-- Better CI/CD performance
+Built
+
+↓
+
+WORKDIR
+
+Built
+
+↓
+
+COPY requirements.txt
+
+Built
+
+↓
+
+RUN pip install
+
+Built
+
+↓
+
+COPY .
+
+Built
+
+↓
+
+CMD
+
+Built
+```
+
+Everything is created.
 
 ---
 
-## Why Layer Order Matters
+### Second Build
 
-Imagine these layers:
+Only `main.py` changed.
+
+Docker now performs
+
+```
+FROM
+
+Cached
+
+↓
+
+WORKDIR
+
+Cached
+
+↓
+
+COPY requirements.txt
+
+Cached
+
+↓
+
+RUN pip install
+
+Cached
+
+↓
+
+COPY .
+
+Rebuilt
+
+↓
+
+CMD
+
+Reused
+```
+
+Only the application code layer changes.
+
+Everything else is reused.
+
+Huge performance improvement.
+
+---
+
+# Poor Dockerfile
+
+```Dockerfile
+COPY . .
+
+RUN pip install -r requirements.txt
+```
+
+Problem
+
+Whenever **any file changes**
+
+Docker must reinstall every dependency.
+
+Very slow.
+
+---
+
+# Better Dockerfile
+
+```Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install -r requirements.txt
+
+COPY . .
+
+CMD ["python","main.py"]
+```
+
+Benefits
+
+- Faster rebuilds
+- Better caching
+- Smaller CI build time
+- Less network usage
+
+---
+
+# Why Layer Order Matters
+
+Docker caches layers from top to bottom.
+
+If an early layer changes,
+
+every layer below it must be rebuilt.
 
 ```
 Layer 1
-Ubuntu
+Base Image
+
 ↓
+
 Layer 2
 Python
+
 ↓
+
 Layer 3
 Dependencies
+
 ↓
+
 Layer 4
 Application Code
 ```
 
-If only the application changes,
-
-Docker rebuilds only Layer 4.
-
-The first three layers come from cache.
-
-Huge time savings.
-
----
-
-## Docker Image Layering
+Changing
 
 ```
 Application Code
-
-────────────
-
-Python Packages
-
-────────────
-
-Operating System
-
-────────────
-
-Base Image
 ```
 
-Every layer is read-only.
+only rebuilds Layer 4.
 
-When a container starts, Docker adds a thin writable layer on top.
+Changing
+
+```
+Layer 2
+```
+
+forces Layers 3 and 4 to rebuild.
+
+---
+
+# Docker Image Layering
+
+Docker images are made of **read-only layers**.
+
+```
+┌─────────────────────────────┐
+│ Application Code            │
+├─────────────────────────────┤
+│ Installed Dependencies      │
+├─────────────────────────────┤
+│ Python Runtime              │
+├─────────────────────────────┤
+│ Ubuntu / Alpine             │
+└─────────────────────────────┘
+```
+
+When a container starts,
+
+Docker adds one more layer.
 
 ```
 Container
+
 ↓
+
 Writable Layer
+
 ↓
-Image Layers (Read Only)
+
+Read-Only Image Layers
 ```
+
+All file changes happen inside the writable layer.
+
+The original image never changes.
 
 ---
 
-## Useful Commands Cheat Sheet
+# Dockerfile Best Practices
+
+- Keep images small.
+- Prefer Alpine or Slim images.
+- Use `.dockerignore`.
+- Combine related RUN commands.
+- Avoid installing unnecessary packages.
+- Copy dependency files before application code.
+- Pin image versions instead of always using `latest`.
+- Use one process per container whenever possible.
+- Remove temporary files after installation.
+- Keep Dockerfiles simple and readable.
+
+---
+
+# Common Mistakes
+
+### Using `latest` Everywhere
+
+Instead of
+
+```Dockerfile
+FROM python:latest
+```
+
+Prefer
+
+```Dockerfile
+FROM python:3.11-slim
+```
+
+Version pinning improves reproducibility.
+
+---
+
+### Forgetting `.dockerignore`
+
+Large folders increase build time unnecessarily.
+
+---
+
+### Copying Everything First
+
+Avoid
+
+```Dockerfile
+COPY . .
+
+RUN pip install
+```
+
+This breaks Docker cache.
+
+---
+
+### Too Many RUN Instructions
+
+Instead of
+
+```Dockerfile
+RUN apt update
+
+RUN apt install curl
+
+RUN apt install git
+```
+
+Combine them
+
+```Dockerfile
+RUN apt update && \
+    apt install -y curl git
+```
+
+This reduces image layers.
+
+---
+
+# Useful Docker Commands
 
 | Command | Description |
 |----------|-------------|
-| docker build -t name:tag . | Build image |
-| docker run image | Run container |
-| docker run --rm image | Remove container after exit |
-| docker run -p 8080:80 image | Publish ports |
-| docker images | List images |
-| docker ps | Running containers |
-| docker ps -a | All containers |
-| docker rmi image | Remove image |
-| docker build --no-cache . | Build without cache |
+| `docker build -t image:tag .` | Build image |
+| `docker run image` | Run container |
+| `docker run --rm image` | Auto remove container |
+| `docker run -p 8080:80 image` | Publish ports |
+| `docker images` | List images |
+| `docker ps` | Running containers |
+| `docker ps -a` | All containers |
+| `docker rmi image` | Remove image |
+| `docker build --no-cache .` | Ignore cache while building |
 
 ---
 
-## Key Points
+# Interview Questions
+
+### What is a Dockerfile?
+
+A text file containing instructions used to build Docker images.
+
+---
+
+### Difference between RUN and CMD?
+
+- RUN executes during image build.
+- CMD executes when the container starts.
+
+---
+
+### Difference between CMD and ENTRYPOINT?
+
+- CMD provides a default command.
+- ENTRYPOINT specifies the main executable.
+
+---
+
+### What is Build Context?
+
+The directory sent to Docker during `docker build`.
+
+---
+
+### Why use `.dockerignore`?
+
+To exclude unnecessary files from the build context.
+
+---
+
+### Why is Docker cache important?
+
+It speeds up image builds by reusing unchanged layers.
+
+---
+
+### Why should dependency installation come before copying source code?
+
+Because dependencies change less frequently, Docker can cache that layer and avoid reinstalling packages on every build.
+
+---
+
+# Key Points
 
 - Dockerfiles automate image creation.
-- Every Dockerfile instruction creates a new image layer.
-- Layer caching dramatically speeds up rebuilds.
-- Always start with lightweight base images whenever possible.
-- Use `.dockerignore` to reduce build context.
-- `CMD` provides the default command.
+- Every instruction creates a new image layer.
+- Docker reuses cached layers whenever possible.
+- `.dockerignore` keeps the build context clean.
+- Layer order directly affects build performance.
+- `CMD` is a default command.
 - `ENTRYPOINT` defines the main executable.
-- `EXPOSE` only documents the intended port.
-- `COPY` moves files into the image.
-- `RUN` executes commands during image creation.
+- `EXPOSE` documents application ports.
+- `COPY` copies files into the image.
+- `RUN` installs software during image creation.
 
 ---
 
-## Key Takeaways
+# Key Takeaways
 
 - Dockerfiles are the blueprint for Docker images.
-- Images become portable and reproducible across systems.
-- Layer ordering directly impacts build performance.
-- Use Docker cache effectively by copying dependencies before source code.
-- Use `.dockerignore` to keep unnecessary files out of the image.
-- Prefer slim or Alpine base images to reduce image size.
-- Learn the difference between `CMD` and `ENTRYPOINT` because it is frequently asked in interviews.
-- Mastering Dockerfiles is the first step toward building production-ready containers and efficient CI/CD pipelines.
+- Images are portable, reproducible, and version-controlled.
+- Layer caching dramatically speeds up rebuilds.
+- Organizing Dockerfile instructions correctly improves CI/CD performance.
+- Always optimize image size using lightweight base images.
+- Use `.dockerignore` to improve build speed and security.
+- Understanding Dockerfile instructions is essential for production-ready containerization.
 
 ---
-
-## Today's Learning Summary
-
-Today I learned:
-
-- Creating Dockerfiles
-- Building custom Docker images
-- Core Dockerfile instructions
-- CMD vs ENTRYPOINT
-- Serving websites using Nginx
-- Using .dockerignore
-- Docker build cache
-- Layer optimization
-- Best practices for writing production-ready Dockerfiles

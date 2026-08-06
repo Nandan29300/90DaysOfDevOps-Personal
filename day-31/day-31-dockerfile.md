@@ -349,15 +349,10 @@ Project Folder
 ├── requirements.txt
 ├── README.md
 └── images/
-
         │
-
 docker build .
-
         │
-
         ▼
-
 Docker Daemon
 ```
 
@@ -462,6 +457,7 @@ sample-all-instructions/
 │
 ├── Dockerfile
 └── main.py
+└── sample.txt (will be generated)
 ```
 
 ---
@@ -1259,6 +1255,8 @@ simple-website/
 │
 ├── Dockerfile
 └── index.html
+└── .dockerignore
+
 ```
 
 ---

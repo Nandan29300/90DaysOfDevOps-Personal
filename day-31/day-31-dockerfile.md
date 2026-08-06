@@ -10,9 +10,13 @@
 - [Why Use Dockerfiles?](#why-use-dockerfiles)
 - [Docker Build Workflow](#docker-build-workflow)
 - [Task 1 - Your First Dockerfile](#task-1---your-first-dockerfile)
+- [Understanding Each Instruction](#understanding-each-instruction)
 - [Understanding Build Context](#understanding-build-context)
 - [Task 2 - Understanding Dockerfile Instructions](#task-2---understanding-dockerfile-instructions)
-
+- [Task 3 - CMD vs ENTRYPOINT](#task-3---cmd-vs-entrypoint)
+- [Task 4 - Build a Simple Web App Image](#task-4---build-a-simple-web-app-image)
+- [Task 5 - .dockerignore](#task-5---dockerignore)
+- [Task 6 - Build Optimization and Cache](#task-6---build-optimization-and-cache)
 ---
 
 # What is a Dockerfile?
@@ -1484,7 +1488,7 @@ build
 
 ---
 
-# Task 6 - Build Optimization & Cache
+# Task 6 - Build Optimization and Cache
 
 One of Docker's biggest advantages is **Layer Caching**.
 

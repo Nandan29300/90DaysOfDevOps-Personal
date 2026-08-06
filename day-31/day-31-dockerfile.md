@@ -11,6 +11,7 @@
 - [Docker Build Workflow](#docker-build-workflow)
 - [Task 1 - Your First Dockerfile](#task-1---your-first-dockerfile)
 - [Understanding Build Context](#understanding-build-context)
+- [Task 2 - Understanding Dockerfile Instructions](#task-2---understanding-dockerfile-instructions)
 
 ---
 

@@ -902,114 +902,10 @@ docker volume rm mysql-data app-db-data
 
 **Do not remove the volumes if you want to preserve the database data.**
 
-------------------------------------------------------------------------
-
-# 16. Screenshots to Capture
-
-Add screenshots from your own terminal/browser experiments at these
-points.
-
-### Screenshot 1 -- Container without volume
-
-Show:
-
-``` bash
-docker ps
-```
-
-and the SQL query showing the inserted rows.
-
-**\[Insert Screenshot 1 here\]**
-
-### Screenshot 2 -- Data lost after container removal
-
-Show:
-
-``` sql
-SHOW TABLES;
-```
-
-after creating a new container without a volume.
-
-**\[Insert Screenshot 2 here\]**
-
-### Screenshot 3 -- Named volume
-
-Show:
-
-``` bash
-docker volume ls
-docker volume inspect mysql-data
-```
-
-**\[Insert Screenshot 3 here\]**
-
-### Screenshot 4 -- Persistent data
-
-Show the data after creating a new MySQL container with the same volume:
-
-``` sql
-SELECT * FROM users;
-```
-
-**\[Insert Screenshot 4 here\]**
-
-### Screenshot 5 -- Bind mount
-
-Show the browser displaying the Nginx page.
-
-**\[Insert Screenshot 5 here\]**
-
-### Screenshot 6 -- Bind mount update
-
-Edit `index.html`, refresh the browser, and capture the updated page.
-
-**\[Insert Screenshot 6 here\]**
-
-### Screenshot 7 -- Docker networks
-
-Show:
-
-``` bash
-docker network ls
-docker network inspect bridge
-```
-
-**\[Insert Screenshot 7 here\]**
-
-### Screenshot 8 -- Default bridge networking
-
-Show the failed name-based ping and successful IP-based ping.
-
-**\[Insert Screenshot 8 here\]**
-
-### Screenshot 9 -- Custom network
-
-Show:
-
-``` bash
-docker network create my-app-net
-docker network ls
-docker exec app1 ping -c 3 app2
-```
-
-**\[Insert Screenshot 9 here\]**
-
-### Screenshot 10 -- Final database + application setup
-
-Show:
-
-``` bash
-docker network inspect my-app-net
-docker volume inspect app-db-data
-docker exec app ping -c 3 app-db
-```
-
-**\[Insert Screenshot 10 here\]**
 
 ------------------------------------------------------------------------
 
-# 17. Final Observations
+# 16. Final Observations
 
 ## Containers without volumes
 
@@ -1082,7 +978,7 @@ app  --->  app-db
 
 ------------------------------------------------------------------------
 
-# 18. Key Commands Learned
+# 17. Key Commands Learned
 
 ### Volumes
 
@@ -1129,7 +1025,7 @@ docker exec container1 ping container2
 
 ------------------------------------------------------------------------
 
-# 19. Day 32 Takeaway
+# 18. Day 32 Takeaway
 
 > **Containers are disposable, but data and services do not have to
 > be.**

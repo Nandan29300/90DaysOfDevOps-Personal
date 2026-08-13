@@ -1,0 +1,46 @@
+services:
+
+  # MySQL database
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+
+    # Database configuration
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+    # Persist MySQL data
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # WordPress application
+  wordpress:
+    image: wordpress:latest
+    restart: unless-stopped
+
+    # Start MySQL before WordPress
+    depends_on:
+      - db
+
+    # Host:Container port
+    ports:
+      - "8080:80"
+
+    # Connect WordPress to MySQL
+    environment:
+      WORDPRESS_DB_HOST: db:3306       # "db" = MySQL service name
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+
+    # Persist WordPress files
+    volumes:
+      - wordpress_data:/var/www/html
+
+# Named volumes for persistence
+volumes:
+  mysql_data:
+  wordpress_data:

@@ -1,0 +1,6 @@
+services:
+  nginx:
+    image: nginx:alpine       # Lightweight Nginx image
+    ports:
+      - "8080:80"             # Host:Container port
+    restart: unless-stopped    # Restart unless manually stopped

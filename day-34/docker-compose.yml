@@ -1,0 +1,91 @@
+services:
+
+  # Flask web app
+  web:
+    build: ./app
+    container_name: day34-web
+    ports:
+      - "5000:5000"
+
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: devops
+      POSTGRES_USER: devops
+      POSTGRES_PASSWORD: devops_password
+      REDIS_HOST: redis
+
+    # Wait for DB to become healthy before starting web
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+    networks:
+      - app-network
+
+    labels:
+      com.day: "34"
+      com.project: "90daysofdevops"
+      com.service: "web"
+
+
+  # PostgreSQL database
+  db:
+    image: postgres:16-alpine
+    container_name: day34-db
+
+    environment:
+      POSTGRES_DB: devops
+      POSTGRES_USER: devops
+      POSTGRES_PASSWORD: devops_password
+
+    # Persist database data
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+    # Restart database if it stops
+    restart: always
+
+    # Check if PostgreSQL is ready
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devops -d devops"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+    networks:
+      - app-network
+
+    labels:
+      com.day: "34"
+      com.project: "90daysofdevops"
+      com.service: "database"
+
+
+  # Redis cache
+  redis:
+    image: redis:7-alpine
+    container_name: day34-redis
+
+    networks:
+      - app-network
+
+    labels:
+      com.day: "34"
+      com.project: "90daysofdevops"
+      com.service: "cache"
+
+
+# Custom network for all services
+networks:
+  app-network:
+    name: day34-app-network
+    driver: bridge
+
+
+# Named volume for PostgreSQL
+volumes:
+  postgres-data:
+    name: day34-postgres-data

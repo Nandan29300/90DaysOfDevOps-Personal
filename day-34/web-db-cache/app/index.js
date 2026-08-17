@@ -7,241 +7,388 @@ const app = express();
 const port = 3000;
 
 const DATABASE_URL = process.env.DATABASE_URL;
-const REDIS_HOST = process.env.REDIS_HOST;
+const REDIS_HOST = process.env.REDIS_HOST || "redis";
 
-// Initialize DB table
+const db = new Client({
+  connectionString: DATABASE_URL,
+});
+
+const redis = createClient({
+  url: `redis://${REDIS_HOST}:6379`,
+});
+
+redis.on("error", (err) => {
+  console.error("Redis error:", err.message);
+});
+
+
+// Initialize PostgreSQL
 async function initDb() {
-  const client = new Client({ connectionString: DATABASE_URL });
-  await client.connect();
+  let attempts = 10;
 
-  await client.query(`
-    CREATE TABLE IF NOT EXISTS visits (
-      id SERIAL PRIMARY KEY,
-      count INTEGER NOT NULL
-    );
-  `);
+  while (attempts > 0) {
+    try {
+      await db.connect();
 
-  await client.end();
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS visits (
+          id SERIAL PRIMARY KEY,
+          count INTEGER NOT NULL
+        );
+      `);
+
+      console.log("PostgreSQL connected.");
+      return;
+    } catch (error) {
+      attempts--;
+
+      console.log(
+        `PostgreSQL not ready. Retrying... (${attempts} attempts left)`
+      );
+
+      if (attempts === 0) {
+        throw error;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    }
+  }
 }
 
+
+// Connect to Redis
+async function initRedis() {
+  await redis.connect();
+  console.log("Redis connected.");
+}
+
+
+// Home page
 app.get("/", async (req, res) => {
-  const db = new Client({ connectionString: DATABASE_URL });
-  const redis = createClient({ url: `redis://${REDIS_HOST}:6379` });
-
   try {
-    await db.connect();
-    if (!redis.isOpen) await redis.connect();
-
-    const result = await db.query("SELECT count FROM visits WHERE id=1");
+    const result = await db.query(
+      "SELECT count FROM visits WHERE id = 1"
+    );
 
     let count;
+
     if (result.rows.length > 0) {
       count = result.rows[0].count + 1;
-      await db.query("UPDATE visits SET count=$1 WHERE id=1", [count]);
+
+      await db.query(
+        "UPDATE visits SET count = $1 WHERE id = 1",
+        [count]
+      );
     } else {
       count = 1;
-      await db.query("INSERT INTO visits (id, count) VALUES (1, $1)", [count]);
+
+      await db.query(
+        "INSERT INTO visits (id, count) VALUES (1, $1)",
+        [count]
+      );
     }
 
     await redis.set("last_visit", count);
-    const cached = await redis.get("last_visit");
 
-    // Test Redis connection status
-    const redisStatus = redis.isOpen ? "green" : "red";
+    const cachedValue = await redis.get("last_visit");
 
-    await db.end();
-    await redis.quit();
-
-    const hostname = os.hostname(); // Container hostname
+    const hostname = os.hostname();
 
     res.send(`
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Docker 3-Tier Demo</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<style>
-:root {
-  --bg-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-  --card-bg: rgba(255,255,255,0.08);
-  --text-color: #fff;
-}
-body {
-  margin:0; font-family:'Segoe UI',sans-serif;
-  height:100vh; overflow:hidden;
-  background: var(--bg-gradient);
-  display:flex; justify-content:center; align-items:center;
-  color:var(--text-color);
-  transition: all 0.5s ease;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-.light-mode {
-  --bg-gradient: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-  --card-bg: rgba(255,255,255,0.8);
-  --text-color: #111;
-}
+  <title>Day 34 - Docker Compose</title>
 
-#particles {
-  position: absolute;
-  top:0; left:0;
-  width:100%; height:100%;
-  z-index:0;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-.card {
-  background: var(--card-bg);
-  backdrop-filter: blur(15px);
-  padding:50px;
-  border-radius:20px;
-  text-align:center;
-  width:500px;
-  z-index:1;
-  box-shadow:0 20px 50px rgba(0,0,0,0.4);
-  animation: fadeIn 1s ease-in-out;
-  position:relative;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, #243b55, transparent 40%),
+        radial-gradient(circle at bottom right, #141e30, #0f172a);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+    }
 
-h1 { margin-bottom:15px; }
+    .container {
+      width: 100%;
+      max-width: 850px;
+    }
 
-.counter { font-size:70px; font-weight:bold; margin:20px 0; color:#00ffc3; }
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+    }
 
-.badges { margin-top:15px; }
-.badge { display:inline-block; padding:8px 14px; border-radius:20px; margin:5px; font-size:14px; font-weight:500; }
-.db { background:#4CAF50; }
-.cache { background:#FF9800; }
+    .header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
 
-.tech-icons { margin-top:20px; font-size:28px; }
-.tech-icons i { margin:10px; transition: transform 0.3s ease; }
-.tech-icons i:hover { transform: scale(1.2); }
+    .header h1 {
+      margin: 0;
+      font-size: 38px;
+    }
 
-.status {
-  display:inline-block;
-  width:14px; height:14px;
-  border-radius:50%;
-  margin-left:6px;
-  vertical-align:middle;
-}
+    .header p {
+      color: #aab7c4;
+      margin-top: 10px;
+    }
 
-.toggle-btn {
-  position:absolute;
-  top:20px; right:20px;
-  cursor:pointer;
-  font-size:22px;
-  z-index:2;
-}
+    .counter {
+      text-align: center;
+      margin: 30px 0;
+    }
 
-.footer { margin-top:20px;font-size:13px;opacity:0.8; }
+    .counter-value {
+      font-size: 70px;
+      font-weight: bold;
+      color: #38bdf8;
+    }
 
-@keyframes fadeIn {
-  from { opacity:0; transform: translateY(20px);}
-  to { opacity:1; transform: translateY(0);}
-}
-</style>
+    .counter-label {
+      color: #aab7c4;
+      font-size: 16px;
+    }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .service {
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.06);
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .service-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .service h3 {
+      margin: 5px 0;
+    }
+
+    .status {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      font-size: 13px;
+    }
+
+    .info {
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      color: #94a3b8;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 25px;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    @media (max-width: 700px) {
+      .services {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 25px;
+      }
+
+      .header h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<canvas id="particles"></canvas>
+  <div class="container">
 
-<div class="toggle-btn" onclick="toggleTheme()">
-  <i class="fas fa-adjust"></i>
-</div>
+    <div class="card">
 
-<div class="card">
-  <h1>🚀 Docker 3-Tier Demo</h1>
+      <div class="header">
+        <h1>🐳 Docker Compose</h1>
+        <p>Day 34 — Multi-Container Application</p>
+      </div>
 
-  <div class="counter" id="counter">0</div>
-  <div>Page Visits</div>
+      <div class="counter">
+        <div class="counter-value">${count}</div>
+        <div class="counter-label">Total Page Visits</div>
+      </div>
 
-  <div class="badges">
-    <span class="badge db">PostgreSQL Connected</span>
-    <span class="badge cache">Redis Active <span class="status" style="background:${redisStatus};"></span></span>
+      <div class="services">
+
+        <div class="service">
+          <div class="service-icon">🟢</div>
+          <h3>Node.js</h3>
+          <div class="status">● Running</div>
+        </div>
+
+        <div class="service">
+          <div class="service-icon">🐘</div>
+          <h3>PostgreSQL</h3>
+          <div class="status">● Connected</div>
+        </div>
+
+        <div class="service">
+          <div class="service-icon">⚡</div>
+          <h3>Redis</h3>
+          <div class="status">● Connected</div>
+        </div>
+
+      </div>
+
+      <div class="info">
+
+        <div class="info-row">
+          <span class="label">Cached Value</span>
+          <strong>${cachedValue}</strong>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Container</span>
+          <strong>${hostname}</strong>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Application Port</span>
+          <strong>3000</strong>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Architecture</span>
+          <strong>Node + PostgreSQL + Redis</strong>
+        </div>
+
+      </div>
+
+      <div class="footer">
+        Running with Docker Compose 🚀
+      </div>
+
+    </div>
+
   </div>
-
-  <div style="margin-top:15px;">
-    Cached Value: <strong>${cached}</strong>
-  </div>
-
-  <div class="tech-icons">
-    <i class="fab fa-node-js"></i>
-    <i class="fas fa-database"></i>
-    <i class="fas fa-memory"></i>
-    <i class="fab fa-docker"></i>
-  </div>
-
-  <div style="margin-top:10px;">
-    Container: <strong>${hostname}</strong>
-  </div>
-
-  <div class="footer">
-    Express.js + PostgreSQL + Redis <br>
-    Running with Docker Compose
-  </div>
-</div>
-
-<script>
-// Animated counter
-let finalValue = ${count};
-let current = 0;
-let speed = 15;
-function animateCounter() {
-  if(current < finalValue){
-    current++;
-    document.getElementById("counter").innerText = current;
-    setTimeout(animateCounter,speed);
-  }
-}
-animateCounter();
-
-// Dark/light auto-detect
-if(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches){
-  document.body.classList.add('light-mode');
-}
-
-function toggleTheme(){
-  document.body.classList.toggle('light-mode');
-}
-
-// Particles effect
-const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-let particles = [];
-for(let i=0;i<100;i++){
-  particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*3+1, dx:(Math.random()-0.5)*1, dy:(Math.random()-0.5)*1});
-}
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  particles.forEach(p=>{
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.fill();
-    p.x += p.dx; p.y += p.dy;
-    if(p.x>canvas.width)p.x=0;
-    if(p.x<0)p.x=canvas.width;
-    if(p.y>canvas.height)p.y=0;
-    if(p.y<0)p.y=canvas.height;
-  });
-  requestAnimationFrame(draw);
-}
-draw();
-
-// Adjust canvas on resize
-window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
-</script>
 
 </body>
 </html>
     `);
 
-  } catch(err){
-    res.status(500).send("Error: "+err.message);
+  } catch (error) {
+    console.error("Request error:", error.message);
+
+    res.status(500).send(`
+      <h1>Application Error</h1>
+      <p>${error.message}</p>
+    `);
   }
 });
 
-app.listen(port,"0.0.0.0",async()=>{
-  console.log("Starting app...");
-  await initDb();
-  console.log(`Server running on port ${port}`);
+
+// Health endpoint
+app.get("/health", async (req, res) => {
+  try {
+    await db.query("SELECT 1");
+    await redis.ping();
+
+    res.status(200).json({
+      status: "healthy",
+      database: "connected",
+      redis: "connected",
+    });
+
+  } catch (error) {
+    res.status(503).json({
+      status: "unhealthy",
+      error: error.message,
+    });
+  }
 });
+
+
+// Start application
+async function startApp() {
+  try {
+    await initDb();
+    await initRedis();
+
+    app.listen(port, "0.0.0.0", () => {
+      console.log(`Server running on port ${port}`);
+    });
+
+  } catch (error) {
+    console.error("Failed to start application:", error);
+    process.exit(1);
+  }
+}
+
+
+// Graceful shutdown
+async function shutdown() {
+  console.log("Shutting down...");
+
+  try {
+    await db.end();
+
+    if (redis.isOpen) {
+      await redis.quit();
+    }
+
+    process.exit(0);
+
+  } catch (error) {
+    console.error("Shutdown error:", error);
+    process.exit(1);
+  }
+}
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
+
+startApp();

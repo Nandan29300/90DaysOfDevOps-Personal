@@ -1,58 +1,81 @@
 services:
-    db:
-      image: postgres:15
-      restart: always
-      # restart: on-failure
-      environment:
-        POSTGRES_USER: ${POSTGRES_USER}
-        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        POSTGRES_DB: ${POSTGRES_DB}
-      ports:
-        - "5432:5432"
-      volumes:
-        - db_data:/var/lib/postgresql/data
-      healthcheck:
-        test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-        interval: 10s
-        timeout: 5s
-        retries: 5
-        start_period: 30s
-      networks:
-        - 3-tier
-      labels:
-        tier: "database"
+
+  # PostgreSQL database
+  db:
+    image: postgres:16-alpine
+    restart: always
+    # restart: on-failure
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    # Optional: expose DB to host for testing
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+    # Check if PostgreSQL is ready
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    networks:
+      - 3-tier
+
+    labels:
+      tier: "database"
 
 
-    redis:
-      image: redis:7-alpine
-      ports:
-       - "6379:6379"
-      networks:
-        - 3-tier
-      labels:
-        tier: "cache"
+  # Redis cache
+  redis:
+    image: redis:7-alpine
 
-    app:
-      build:
-        context: ./app
-        dockerfile: Dockerfile
-      ports:
-        - "${APP_PORT}:3000"
-      networks:
-        - 3-tier
-      environment:
-      #postgres://<username>:<password>@<host>:<port>/<database>
-          DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"  
-          REDIS_HOST: redis
-      depends_on:
-        db:
-          condition: service_healthy
-      labels:
-        tier: "web"
+    # Optional: expose Redis to host for testing
+    ports:
+      - "6379:6379"
+
+    networks:
+      - 3-tier
+
+    labels:
+      tier: "cache"
+
+
+  # Node.js web application
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+
+    ports:
+      - "${APP_PORT}:3000"
+
+    environment:
+      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      REDIS_HOST: redis
+
+    # App waits for DB to be healthy
+    depends_on:
+      db:
+        condition: service_healthy
+
+    networks:
+      - 3-tier
+
+    labels:
+      tier: "web"
 
 
 volumes:
-    db_data:
+  db_data:
+
 
 networks:
   3-tier:

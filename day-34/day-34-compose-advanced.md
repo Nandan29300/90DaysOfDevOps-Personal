@@ -6,14 +6,14 @@
 
 Created a 3-service Docker Compose stack:
 
-- A **web app** using Python Flask
+- A **web app** using Node.js and Express
 - A **database** using PostgreSQL
 - A **cache** using Redis
 
 The architecture:
 
 ```text
-                Flask Web App
+                 Node.js App
                      |
              -----------------
              |               |
@@ -21,35 +21,33 @@ The architecture:
         Database            Cache
 ```
 
-Flask connects to PostgreSQL using the service name `db` and Redis using the service name `redis`.
+The Node.js app connects to PostgreSQL using the service name `db` and Redis using the service name `redis`.
 
-[Code](web_db_cache/)
+[Code](web-db-cache/)
 
 ---
 
 ### Task 2: depends_on & Healthchecks
 
-1. Added `depends_on` so the Flask app starts after the required services.
+1. Added `depends_on` so the app starts after PostgreSQL is healthy.
 2. Added a PostgreSQL healthcheck.
-3. Used `condition: service_healthy` so Flask waits until PostgreSQL is actually ready.
+3. Used `condition: service_healthy` so the app waits until PostgreSQL is truly ready.
 
 ```yaml
 depends_on:
   db:
     condition: service_healthy
-  redis:
-    condition: service_started
 ```
 
 PostgreSQL healthcheck:
 
 ```yaml
 healthcheck:
-  test: ["CMD-SHELL", "pg_isready -U devops -d devops"]
-  interval: 5s
+  test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+  interval: 10s
   timeout: 5s
   retries: 5
-  start_period: 5s
+  start_period: 10s
 ```
 
 **Test:** Bring everything down and up.
@@ -59,11 +57,11 @@ sudo docker compose down
 sudo docker compose up
 ```
 
-- PostgreSQL container starts.
+- PostgreSQL container starts first.
 - PostgreSQL healthcheck runs.
 - PostgreSQL becomes `healthy`.
-- Redis starts.
-- Flask starts after the required dependency conditions are satisfied.
+- App container starts after PostgreSQL is healthy.
+- Redis starts as part of the Compose stack.
 
 Check PostgreSQL health:
 
@@ -103,7 +101,7 @@ entrypoint: ["/bin/sh", "-c"]
 command: ["exit 0"]
 ```
 
-Then:
+Then recreated the database:
 
 ```bash
 sudo docker compose up -d --force-recreate db
@@ -115,11 +113,11 @@ Checked:
 sudo docker inspect day34-db --format='Status={{.State.Status}} ExitCode={{.State.ExitCode}} RestartCount={{.RestartCount}}'
 ```
 
-With `restart: always`, Docker keeps restarting the container even when the process exits successfully with exit code `0`.
+With `restart: always`, Docker restarts the container even when the process exits successfully with exit code `0`.
 
 ![image](images/task3.1.png)
 
-> Note: Manually using `docker kill day34-db` is not a reliable test for observing an automatic restart because manually stopped containers are not immediately restarted in the same way as containers whose main process exits.
+> Note: `docker kill day34-db` is not a reliable way to observe the restart policy because a manually stopped container is not immediately restarted in the same way as a container whose main process exits.
 
 #### 2. `restart: on-failure`
 
@@ -143,7 +141,7 @@ entrypoint: ["/bin/sh", "-c"]
 command: ["exit 1"]
 ```
 
-Then:
+Then recreated the database:
 
 ```bash
 sudo docker compose up -d --force-recreate db
@@ -188,25 +186,29 @@ restart: always
 
 ### Task 4: Custom Dockerfiles in Compose
 
-Instead of using a pre-built image for the Flask application, used:
+Instead of using a pre-built image for the Node.js application, used:
 
 ```yaml
-build: ./app
+build:
+  context: ./app
+  dockerfile: Dockerfile
 ```
 
-This tells Docker Compose to build the web image using:
+This tells Docker Compose to build the application using:
 
 ```text
 app/Dockerfile
 ```
 
+The application uses a Node.js Alpine image and installs its dependencies from `package.json`.
+
 [Dockerfile](web_db_cache/app/Dockerfile)
 
-Before making the change:
+Before making the code change:
 
 ![image](images/before.png)
 
-Made a code change in `app.py`.
+Made a code change in `app/index.js`.
 
 Then rebuilt and restarted with:
 
@@ -228,12 +230,11 @@ The updated application was running using the newly built image.
 
 #### 1. Custom Network
 
-Defined an explicit Docker network:
+Defined an explicit Docker network instead of relying on the default network:
 
 ```yaml
 networks:
-  app-network:
-    name: day34-app-network
+  3-tier:
     driver: bridge
 ```
 
@@ -241,7 +242,14 @@ All three services use this network:
 
 ```yaml
 networks:
-  - app-network
+  - 3-tier
+```
+
+This allows the services to communicate using their Compose service names:
+
+```text
+db:5432
+redis:6379
 ```
 
 Check it with:
@@ -253,8 +261,10 @@ sudo docker network ls
 And:
 
 ```bash
-sudo docker network inspect day34-app-network
+sudo docker network inspect day-34-3-tier
 ```
+
+---
 
 #### 2. Named Volume
 
@@ -262,15 +272,14 @@ Created a named volume for PostgreSQL:
 
 ```yaml
 volumes:
-  - postgres-data:/var/lib/postgresql/data
+  - db_data:/var/lib/postgresql/data
 ```
 
 Defined it as:
 
 ```yaml
 volumes:
-  postgres-data:
-    name: day34-postgres-data
+  db_data:
 ```
 
 Check it with:
@@ -292,15 +301,25 @@ The PostgreSQL visit count remained because the named volume preserved the datab
 
 > Do not use `docker compose down -v` when testing persistence because `-v` removes the volumes.
 
+---
+
 #### 3. Labels
 
 Added labels to the services:
 
 ```yaml
 labels:
-  com.day: "34"
-  com.project: "90daysofdevops"
-  com.service: "web"
+  tier: "database"
+```
+
+```yaml
+labels:
+  tier: "cache"
+```
+
+```yaml
+labels:
+  tier: "web"
 ```
 
 Checked using:
@@ -317,31 +336,37 @@ Labels provide metadata useful for organization, filtering and automation.
 
 ### Task 6: Scaling
 
-Tried scaling the Flask web application to 3 replicas:
+Tried scaling the Node.js web application to 3 replicas:
 
 ```bash
-sudo docker compose up --scale web=3 -d
+sudo docker compose up --scale app=3 -d
 ```
 
-The web service uses:
+The app service uses:
 
 ```yaml
 ports:
-  - "5000:5000"
+  - "${APP_PORT}:3000"
 ```
 
-This means:
+For example, if:
 
 ```text
-Host port 5000 → Container port 5000
+APP_PORT=5000
+```
+
+then:
+
+```text
+Host port 5000 → Container port 3000
 ```
 
 When scaling to 3 replicas:
 
 ```text
-web-1 → host port 5000
-web-2 → host port 5000
-web-3 → host port 5000
+app-1 → host port 5000
+app-2 → host port 5000
+app-3 → host port 5000
 ```
 
 The first container started successfully.
@@ -359,7 +384,7 @@ The host port mapping causes a conflict.
 Docker cannot bind multiple containers to the same host port:
 
 ```text
-5000:5000
+5000:3000
 ```
 
 ### Why doesn't simple scaling work with port mapping?
@@ -373,8 +398,10 @@ In a production setup, multiple application replicas would normally sit behind a
                        |
               -------------------
               |        |        |
-            web-1    web-2    web-3
+            app-1    app-2    app-3
 ```
+
+The load balancer distributes incoming traffic between the application replicas.
 
 After the scaling experiment:
 
@@ -396,10 +423,11 @@ Returned to the normal 3-service setup.
                           |
                           v
                   +---------------+
-                  |   Flask Web   |
+                  |   Node.js App |
+                  |    Express    |
                   +-------+-------+
                           |
-                  day34-app-network
+                       3-tier
                     +-----+-----+
                     |           |
                     v           v
@@ -409,25 +437,26 @@ Returned to the normal 3-service setup.
               +-----+-----+ +---------+
                     |
                     v
-             day34-postgres-data
+                  db_data
                 named volume
 ```
 
 ## What I Learned
 
 - Docker Compose can manage multiple related containers as one application.
-- Flask acts as the web application.
+- Node.js and Express act as the web application.
 - PostgreSQL stores persistent application data.
 - Redis provides fast cache data.
 - `depends_on` controls service startup dependencies.
 - A healthcheck verifies that PostgreSQL is actually ready.
-- `condition: service_healthy` makes Flask wait for PostgreSQL readiness.
+- `condition: service_healthy` makes the app wait for PostgreSQL readiness.
 - Restart policies can automatically recover containers.
 - `restart: always` and `restart: on-failure` behave differently.
 - Named volumes preserve database data.
 - Custom networks allow containers to communicate using service names.
 - Labels add useful metadata to Docker services.
 - `build:` allows Compose to build an application from a custom Dockerfile.
+- `package.json` defines the Node.js application dependencies.
 - Simple scaling fails when multiple replicas try to use the same host port.
 - Load balancers/reverse proxies are commonly used to distribute traffic across replicas.
 

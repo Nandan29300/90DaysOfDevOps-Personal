@@ -1,3 +1,0 @@
-Flask==3.1.2 #creates our web application
-psycopg2-binary==2.9.10 #lets Python/Flask connect to PostgreSQL
-redis==6.4.0 #lets Python/Flask connect to Redis

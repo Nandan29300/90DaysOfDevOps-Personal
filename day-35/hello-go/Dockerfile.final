@@ -1,0 +1,30 @@
+# Stage 1: Build
+FROM golang:1.24-alpine AS builder
+
+WORKDIR /build
+
+# Copy source code
+COPY main.go .
+
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -o hello main.go
+
+
+# Stage 2: Runtime
+FROM alpine:3.22
+
+# Create a non-root user and group
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup
+
+WORKDIR /app
+
+# Copy only the compiled binary
+COPY --from=builder /build/hello .
+
+# Change ownership and switch to non-root user
+RUN chown appuser:appgroup /app/hello
+
+USER appuser
+
+CMD ["./hello"]

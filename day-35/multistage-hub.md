@@ -296,3 +296,132 @@ copies the required artifact from that stage into the final runtime image.
 > **Build with a full environment, run with only what you need.**
 
 ---
+
+# Task 3: Push to Docker Hub
+
+## Objective
+
+Push the optimized multi-stage Go Docker image to Docker Hub and verify that it can be pulled and executed successfully.
+
+---
+
+## Docker Hub Repository
+
+Repository:
+
+```text
+YOUR_USERNAME/day35-go
+```
+
+Image tag:
+
+```text
+v1
+```
+
+> Replace `YOUR_USERNAME` with the actual Docker Hub username.
+
+---
+
+## Login to Docker Hub
+
+```bash
+docker login
+```
+
+Successful login:
+
+```text
+Login Succeeded
+```
+
+---
+
+## Tag the Image
+
+The local multi-stage image:
+
+```text
+day35-go-multistage:v1
+```
+
+was tagged for Docker Hub:
+
+```bash
+docker tag day35-go-multistage:v1 YOUR_USERNAME/day35-go:v1
+```
+
+Docker Hub image format:
+
+```text
+YOUR_USERNAME/day35-go:v1
+```
+
+---
+
+## Push Image
+
+```bash
+docker push YOUR_USERNAME/day35-go:v1
+```
+
+The image was successfully uploaded to Docker Hub.
+
+---
+
+## Verify on Docker Hub
+
+The repository was checked on Docker Hub.
+
+Repository:
+
+```text
+YOUR_USERNAME/day35-go
+```
+
+Available tag:
+
+```text
+v1
+```
+
+---
+
+## Pull Image
+
+To verify that the image can be downloaded from Docker Hub:
+
+```bash
+docker pull YOUR_USERNAME/day35-go:v1
+```
+
+---
+
+## Run Pulled Image
+
+```bash
+docker run --rm YOUR_USERNAME/day35-go:v1
+```
+
+Output:
+
+```text
+Hello from Day 35 - Go Docker!
+```
+
+---
+
+## Verification
+
+The image was successfully:
+
+1. Built using a multi-stage Dockerfile
+2. Tagged with the Docker Hub repository name
+3. Pushed to Docker Hub
+4. Removed from the local environment
+5. Pulled again from Docker Hub
+6. Successfully executed
+
+This confirms that the Docker image is available for distribution through Docker Hub.
+
+---

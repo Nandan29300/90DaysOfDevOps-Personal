@@ -100,3 +100,199 @@ This increases:
 - Security attack surface
 
 Multi-stage builds solve this problem by separating the build environment from the runtime environment.
+
+---
+
+# Task 2: Multi-Stage Build
+
+## Objective
+
+Rewrite the single-stage Dockerfile using a multi-stage build so that the final image contains only the required runtime components and the compiled Go application.
+
+---
+
+## Multi-Stage Dockerfile
+
+### Dockerfile.multistage
+
+```dockerfile
+# Stage 1: Build
+FROM golang:1.24-alpine AS builder
+
+WORKDIR /build
+
+# Copy Go source code
+COPY main.go .
+
+# Build a statically linked Go binary
+RUN CGO_ENABLED=0 GOOS=linux go build -o hello main.go
+
+
+# Stage 2: Runtime
+FROM alpine:3.22
+
+WORKDIR /app
+
+# Copy only the compiled binary from the builder stage
+COPY --from=builder /build/hello .
+
+# Run as non-root user
+USER nobody
+
+CMD ["./hello"]
+```
+
+---
+
+## Stage 1 - Builder
+
+```dockerfile
+FROM golang:1.24-alpine AS builder
+```
+
+The first stage contains the Go compiler and required build tools.
+
+The application source code is copied into the builder:
+
+```dockerfile
+COPY main.go .
+```
+
+Then the Go application is compiled:
+
+```dockerfile
+RUN CGO_ENABLED=0 GOOS=linux go build -o hello main.go
+```
+
+The output is a compiled binary named:
+
+```text
+hello
+```
+
+---
+
+## Stage 2 - Runtime
+
+```dockerfile
+FROM alpine:3.22
+```
+
+The second stage uses a much smaller runtime image.
+
+Only the compiled application is copied from the builder:
+
+```dockerfile
+COPY --from=builder /build/hello .
+```
+
+The Go compiler, SDK, source code and other build dependencies are not included in the final image.
+
+---
+
+## Build Command
+
+```bash
+docker build -f Dockerfile.multistage -t day35-go-multistage:v1 .
+```
+
+---
+
+## Run Container
+
+```bash
+docker run --rm day35-go-multistage:v1
+```
+
+### Output
+
+```text
+Hello from Day 35 - Go Docker!
+```
+
+---
+
+## Image Size Comparison
+
+Command used:
+
+```bash
+docker images
+```
+
+| Image | Tag | Size |
+|---|---|---:|
+| day35-go-single | v1 | **638 MB** |
+| day35-go-multistage | v1 | **255 MB** |
+
+### Size Reduction
+
+```text
+638 MB - 255 MB = 383 MB
+```
+
+The multi-stage image is approximately **60% smaller** than the single-stage image.
+
+---
+
+## Why Is the Multi-Stage Image Smaller?
+
+In the single-stage build, the final image contains the complete Go development environment, including:
+
+- Go compiler
+- Go SDK
+- Build tools
+- Source code
+- Compiled application
+
+The compiler and development tools are required only during the build process. They are not required to run the application.
+
+With a multi-stage build:
+
+```text
+Stage 1: Builder
+Go SDK + Compiler + Source Code
+              │
+              ▼
+        Compiled Binary
+              │
+              ▼
+Stage 2: Runtime
+Minimal Alpine Image + Binary
+```
+
+The `COPY --from=builder` instruction copies only the compiled application into the final image.
+
+Therefore, unnecessary build dependencies are left behind in the builder stage.
+
+### Key Benefit
+
+Multi-stage builds produce:
+
+- Smaller images
+- Faster image transfers
+- Faster deployments
+- Reduced attack surface
+- Cleaner production images
+
+---
+
+## Key Concept
+
+```dockerfile
+FROM golang:1.24-alpine AS builder
+```
+
+creates a named build stage.
+
+Then:
+
+```dockerfile
+COPY --from=builder /build/hello .
+```
+
+copies the required artifact from that stage into the final runtime image.
+
+> **Build with a full environment, run with only what you need.**
+
+---

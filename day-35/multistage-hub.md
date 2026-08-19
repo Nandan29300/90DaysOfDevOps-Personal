@@ -193,7 +193,7 @@ The Go compiler, SDK, source code and other build dependencies are not included 
 ## Build Command
 
 ```bash
-docker build -f Dockerfile.multistage -t day35-go-multistage:v1 .
+docker build -f Dockerfile.multistage -t go-multi-stage:v1 .
 ```
 
 ---
@@ -201,7 +201,7 @@ docker build -f Dockerfile.multistage -t day35-go-multistage:v1 .
 ## Run Container
 
 ```bash
-docker run --rm day35-go-multistage:v1
+docker run --rm go-multi-stage:v1
 ```
 
 ### Output
@@ -222,8 +222,8 @@ docker images
 
 | Image | Tag | Size |
 |---|---|---:|
-| day35-go-single | v1 | **638 MB** |
-| day35-go-multistage | v1 | **255 MB** |
+| go-single-stage | v1 | **638 MB** |
+| go-multi-stage | v1 | **255 MB** |
 
 ### Size Reduction
 

@@ -567,3 +567,265 @@ Using version-specific tags such as `v1`, `v2`, and `v3` makes image versions ex
 The `latest` tag is convenient for development and simple deployments, but it can change over time and therefore does not guarantee a fixed image version.
 
 ---
+
+# Task 5: Image Best Practices
+
+## Objective
+
+Apply Docker image best practices to create a smaller, safer and more production-ready image.
+
+The following practices were applied:
+
+1. Use a minimal base image
+2. Run the application as a non-root user
+3. Combine related `RUN` commands
+4. Use specific image tags instead of `latest`
+
+---
+
+## Final Dockerfile
+
+### Dockerfile.final
+
+```dockerfile
+# Stage 1: Build
+FROM golang:1.24-alpine AS builder
+
+WORKDIR /build
+
+# Copy source code
+COPY main.go .
+
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -o hello main.go
+
+
+# Stage 2: Runtime
+FROM alpine:3.22
+
+# Create a non-root user and group
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup
+
+WORKDIR /app
+
+# Copy only the compiled binary
+COPY --from=builder /build/hello .
+
+# Change ownership
+RUN chown appuser:appgroup /app/hello
+
+# Run the container as a non-root user
+USER appuser
+
+CMD ["./hello"]
+```
+
+---
+
+## Best Practice 1: Minimal Base Image
+
+The final runtime image uses:
+
+```dockerfile
+FROM alpine:3.22
+```
+
+Alpine is a minimal Linux distribution designed to keep container images small.
+
+Compared with a general-purpose Ubuntu image, Alpine provides a much smaller runtime environment when only basic Linux functionality is required.
+
+### Comparison
+
+| Base Image | Purpose |
+|---|---|
+| Ubuntu | General-purpose Linux distribution |
+| Alpine | Minimal container-focused Linux distribution |
+
+Using Alpine reduces unnecessary packages and keeps the runtime image smaller.
+
+---
+
+## Best Practice 2: Don't Run as Root
+
+A dedicated user and group were created:
+
+```dockerfile
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup
+```
+
+The container then switches to:
+
+```dockerfile
+USER appuser
+```
+
+This means the application does not run with root privileges.
+
+### Verification
+
+Command:
+
+```bash
+docker run --rm day35-go-final:v1 whoami
+```
+
+Output:
+
+```text
+appuser
+```
+
+This reduces the potential impact of a container compromise.
+
+---
+
+## Best Practice 3: Combine RUN Commands
+
+Related commands were combined:
+
+```dockerfile
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup
+```
+
+Instead of creating separate `RUN` instructions:
+
+```dockerfile
+RUN addgroup -S appgroup
+RUN adduser -S appuser -G appgroup
+```
+
+Combining related commands can reduce unnecessary image layers and keeps the Dockerfile cleaner.
+
+---
+
+## Best Practice 4: Use Specific Base Image Tags
+
+Instead of:
+
+```dockerfile
+FROM golang:latest
+```
+
+a specific tag is used:
+
+```dockerfile
+FROM golang:1.24-alpine
+```
+
+The runtime image also uses a specific version:
+
+```dockerfile
+FROM alpine:3.22
+```
+
+Using specific tags makes builds more predictable because the base image version is explicitly defined.
+
+---
+
+## Multi-Stage Build
+
+The final Dockerfile continues to use a multi-stage build.
+
+### Builder stage
+
+```text
+golang:1.24-alpine
+        │
+        ├── Go compiler
+        ├── Go SDK
+        └── Source code
+                │
+                ▼
+          Compiled binary
+```
+
+### Runtime stage
+
+```text
+alpine:3.22
+      │
+      ├── Application binary
+      └── Non-root user
+```
+
+The final image does not contain the Go compiler or SDK.
+
+---
+
+## Image Size Comparison
+
+```bash
+docker images
+```
+
+| Image | Tag | Size |
+|---|---|---:|
+| Single-stage | v1 | **638 MB** |
+| Multi-stage | v1 | **255 MB** |
+| Final optimized | v1 | **_____ MB** |
+
+> Replace the final image size with the actual value from `docker images`.
+
+---
+
+## Final Verification
+
+Build:
+
+```bash
+docker build -f Dockerfile.final -t day35-go-final:v1 .
+```
+
+Run:
+
+```bash
+docker run --rm day35-go-final:v1
+```
+
+Output:
+
+```text
+Hello from Day 35 - Go Docker!
+```
+
+Verify the user:
+
+```bash
+docker run --rm day35-go-final:v1 whoami
+```
+
+Output:
+
+```text
+appuser
+```
+
+---
+
+## Best Practices Applied
+
+| Practice | Implementation |
+|---|---|
+| Multi-stage build | `FROM ... AS builder` + `COPY --from=builder` |
+| Minimal base image | `alpine:3.22` |
+| Non-root user | `USER appuser` |
+| Fewer layers | Combined related `RUN` commands |
+| Fixed versions | `golang:1.24-alpine`, `alpine:3.22` |
+| Small runtime | Only compiled Go binary copied |
+
+---
+
+## Key Takeaway
+
+A production Docker image should contain only what is required to run the application.
+
+The final image uses:
+
+**Build environment → Compile application → Minimal runtime → Non-root user**
+
+This makes the image smaller, more predictable and safer than the original single-stage image.
+
+---

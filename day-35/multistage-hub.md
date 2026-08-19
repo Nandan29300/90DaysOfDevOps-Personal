@@ -425,3 +425,145 @@ The image was successfully:
 This confirms that the Docker image is available for distribution through Docker Hub.
 
 ---
+
+# Task 4: Docker Hub Repository
+
+## Objective
+
+Explore the Docker Hub repository, add a repository description, understand image tags, and compare pulling a specific tag with pulling the `latest` tag.
+
+---
+
+## Docker Hub Repository
+
+Repository:
+
+```text
+YOUR_USERNAME/day35-go
+```
+
+The repository contains the Go Docker image pushed during Task 3.
+
+---
+
+## Repository Description
+
+Added the following description to the Docker Hub repository:
+
+> A Dockerized Go application demonstrating multi-stage builds, optimized image creation, and Docker Hub image distribution as part of my #90DaysOfDevOps journey.
+
+---
+
+## Tags
+
+The repository was inspected through the **Tags** section.
+
+Current image tag:
+
+```text
+v1
+```
+
+Docker image format:
+
+```text
+YOUR_USERNAME/day35-go:v1
+```
+
+Here:
+
+- `YOUR_USERNAME` = Docker Hub username
+- `day35-go` = repository name
+- `v1` = image tag/version
+
+---
+
+## Pulling a Specific Tag
+
+Command:
+
+```bash
+docker pull YOUR_USERNAME/day35-go:v1
+```
+
+A specific tag points to a particular version of the image.
+
+For example:
+
+```text
+v1 → Version 1
+v2 → Version 2
+v3 → Version 3
+```
+
+When `v1` is requested, Docker pulls the image associated with the `v1` tag.
+
+---
+
+## Pulling `latest`
+
+Command:
+
+```bash
+docker pull YOUR_USERNAME/day35-go:latest
+```
+
+The `latest` tag is a conventional tag that can point to whichever image is currently designated as `latest`.
+
+For example:
+
+```text
+latest → v3
+```
+
+Later it could be changed to:
+
+```text
+latest → v4
+```
+
+The `v3` tag itself can remain unchanged.
+
+### Important
+
+`latest` does **not automatically mean the newest image**.
+
+It is simply a tag named `latest`, and its target can change.
+
+---
+
+## Tag Comparison
+
+| Tag | Meaning |
+|---|---|
+| `v1` | Specific version of the image |
+| `v2` | Another specific version |
+| `latest` | Image currently assigned the `latest` tag |
+
+### Example
+
+```text
+YOUR_USERNAME/day35-go:v1
+```
+
+means:
+
+> Pull the image tagged `v1`.
+
+```text
+YOUR_USERNAME/day35-go:latest
+```
+
+means:
+
+> Pull the image currently tagged `latest`.
+
+---
+
+## Key Takeaway
+
+Using version-specific tags such as `v1`, `v2`, and `v3` makes image versions explicit and reproducible.
+
+The `latest` tag is convenient for development and simple deployments, but it can change over time and therefore does not guarantee a fixed image version.
+
+---

@@ -74,10 +74,10 @@ Output:
 
 ```text
 REPOSITORY        TAG       SIZE
-go-single-stage   v1        <your-size>
+go-single-stage   v1        1.22GB
 ```
 
-Image Size: `<your-size>`
+Image Size: `1.22GB`
 
 ---
 
@@ -222,16 +222,16 @@ docker images
 
 | Image | Tag | Size |
 |---|---|---:|
-| go-single-stage | v1 | **638 MB** |
-| go-multi-stage | v1 | **255 MB** |
+| go-single-stage | v1 | **1.22 GB** |
+| go-multi-stage | v1 | **16.3 MB** |
 
 ### Size Reduction
 
 ```text
-638 MB - 255 MB = 383 MB
+1.22 GB - 16.3 MB = 1.204 GB
 ```
 
-The multi-stage image is approximately **60% smaller** than the single-stage image.
+The multi-stage image is approximately **98.7% smaller** than the single-stage image.
 
 ---
 

@@ -310,7 +310,7 @@ Push the optimized multi-stage Go Docker image to Docker Hub and verify that it 
 Repository:
 
 ```text
-YOUR_USERNAME/day35-go
+YOUR_USERNAME/go-multi-stage
 ```
 
 Image tag:
@@ -342,19 +342,19 @@ Login Succeeded
 The local multi-stage image:
 
 ```text
-day35-go-multistage:v1
+go-multi-stage:v1
 ```
 
 was tagged for Docker Hub:
 
 ```bash
-docker tag day35-go-multistage:v1 YOUR_USERNAME/day35-go:v1
+docker tag go-multi-stage:v1 YOUR_USERNAME/go-multi-stage:v1
 ```
 
 Docker Hub image format:
 
 ```text
-YOUR_USERNAME/day35-go:v1
+YOUR_USERNAME/go-multi-stage:v1
 ```
 
 ---
@@ -362,7 +362,7 @@ YOUR_USERNAME/day35-go:v1
 ## Push Image
 
 ```bash
-docker push YOUR_USERNAME/day35-go:v1
+docker push YOUR_USERNAME/go-multi-stage:v1
 ```
 
 The image was successfully uploaded to Docker Hub.
@@ -376,7 +376,7 @@ The repository was checked on Docker Hub.
 Repository:
 
 ```text
-YOUR_USERNAME/day35-go
+YOUR_USERNAME/go-multi-stage
 ```
 
 Available tag:
@@ -392,7 +392,7 @@ v1
 To verify that the image can be downloaded from Docker Hub:
 
 ```bash
-docker pull YOUR_USERNAME/day35-go:v1
+docker pull YOUR_USERNAME/go-multi-stage:v1
 ```
 
 ---
@@ -400,7 +400,7 @@ docker pull YOUR_USERNAME/day35-go:v1
 ## Run Pulled Image
 
 ```bash
-docker run --rm YOUR_USERNAME/day35-go:v1
+docker run --rm YOUR_USERNAME/go-multi-stage:v1
 ```
 
 Output:
@@ -439,7 +439,7 @@ Explore the Docker Hub repository, add a repository description, understand imag
 Repository:
 
 ```text
-YOUR_USERNAME/day35-go
+YOUR_USERNAME/go-multi-stage
 ```
 
 The repository contains the Go Docker image pushed during Task 3.
@@ -467,13 +467,13 @@ v1
 Docker image format:
 
 ```text
-YOUR_USERNAME/day35-go:v1
+YOUR_USERNAME/go-multi-stage:v1
 ```
 
 Here:
 
 - `YOUR_USERNAME` = Docker Hub username
-- `day35-go` = repository name
+- `go-multi-stage` = repository name
 - `v1` = image tag/version
 
 ---
@@ -483,7 +483,7 @@ Here:
 Command:
 
 ```bash
-docker pull YOUR_USERNAME/day35-go:v1
+docker pull YOUR_USERNAME/go-multi-stage:v1
 ```
 
 A specific tag points to a particular version of the image.
@@ -505,7 +505,7 @@ When `v1` is requested, Docker pulls the image associated with the `v1` tag.
 Command:
 
 ```bash
-docker pull YOUR_USERNAME/day35-go:latest
+docker pull YOUR_USERNAME/go-multi-stage:latest
 ```
 
 The `latest` tag is a conventional tag that can point to whichever image is currently designated as `latest`.
@@ -543,7 +543,7 @@ It is simply a tag named `latest`, and its target can change.
 ### Example
 
 ```text
-YOUR_USERNAME/day35-go:v1
+YOUR_USERNAME/go-multi-stage:v1
 ```
 
 means:
@@ -551,7 +551,7 @@ means:
 > Pull the image tagged `v1`.
 
 ```text
-YOUR_USERNAME/day35-go:latest
+YOUR_USERNAME/go-multi-stage:latest
 ```
 
 means:
@@ -668,7 +668,7 @@ This means the application does not run with root privileges.
 Command:
 
 ```bash
-docker run --rm day35-go-final:v1 whoami
+docker run --rm go-final-stage:v1 whoami
 ```
 
 Output:
@@ -763,11 +763,9 @@ docker images
 
 | Image | Tag | Size |
 |---|---|---:|
-| Single-stage | v1 | **638 MB** |
-| Multi-stage | v1 | **255 MB** |
-| Final optimized | v1 | **_____ MB** |
-
-> Replace the final image size with the actual value from `docker images`.
+| Single-stage | v1 | **1.22 GB** |
+| Multi-stage | v1 | **16.3 MB** |
+| Final optimized | v1 | **19.9 MB** |
 
 ---
 
@@ -776,13 +774,13 @@ docker images
 Build:
 
 ```bash
-docker build -f Dockerfile.final -t day35-go-final:v1 .
+docker build -f Dockerfile.final -t go-final-stage:v1 .
 ```
 
 Run:
 
 ```bash
-docker run --rm day35-go-final:v1
+docker run --rm go-final-stage:v1
 ```
 
 Output:
@@ -794,7 +792,7 @@ Hello from Day 35 - Go Docker!
 Verify the user:
 
 ```bash
-docker run --rm day35-go-final:v1 whoami
+docker run --rm go-final-stage:v1 whoami
 ```
 
 Output:
@@ -820,12 +818,12 @@ appuser
 
 ## Key Takeaway
 
-A production Docker image should contain only what is required to run the application.
+- A production Docker image should contain only what is required to run the application.
 
-The final image uses:
+- The final image uses:
 
-**Build environment → Compile application → Minimal runtime → Non-root user**
+     **Build environment → Compile application → Minimal runtime → Non-root user**
 
-This makes the image smaller, more predictable and safer than the original single-stage image.
+- This makes the image smaller, more predictable and safer than the original single-stage image.
 
 ---

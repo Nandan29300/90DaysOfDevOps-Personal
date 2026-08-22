@@ -38,7 +38,7 @@ DockerBuddy focuses on commonly used Docker concepts such as:
 - Build commands
 - Configuration
 
-The application currently contains 80+ useful Docker commands.
+The application currently contains 50+ useful Docker commands.
 
 ---
 
@@ -132,12 +132,6 @@ The project uses **two Dockerfiles**.
 
 ### Backend Dockerfile
 
-Location:
-
-```text
-backend/Dockerfile
-```
-
 The backend image uses Node.js Alpine as a lightweight base image.
 
 Main concepts used:
@@ -157,12 +151,6 @@ nandan56/dockerbuddy-backend:v1.0.0
 ```
 
 ### Frontend Dockerfile
-
-Location:
-
-```text
-frontend/Dockerfile
-```
 
 The frontend uses a **multi-stage Docker build**.
 
@@ -686,26 +674,6 @@ PostgreSQL
 ```
 
 The application can be started using Docker Compose and the application images are available through Docker Hub.
-
-The project demonstrates the complete flow:
-
-```text
-Application
-    ↓
-Dockerfiles
-    ↓
-Docker Compose
-    ↓
-Containers
-    ↓
-Docker Hub
-    ↓
-Fresh Deployment
-```
-
-### DockerBuddy
-
-A simple Docker command reference built as a practical Day 36 Docker project.
 
 ---
 

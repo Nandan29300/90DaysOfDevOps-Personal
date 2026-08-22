@@ -4,6 +4,8 @@
 
 ### 1. Project Overview
 
+<img width="1920" height="981" alt="Screenshot from 2026-08-22 15-06-29" src="https://github.com/user-attachments/assets/ec2884dc-a4a5-44ba-82d4-be23724f201d" />
+
 For Day 36 of my #90DaysOfDevOps journey, I built **DockerBuddy**, a beginner-friendly Docker command reference application.
 
 The goal was to take a complete application and Dockerize it end-to-end using:

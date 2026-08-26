@@ -23,6 +23,8 @@ The following YAML files were created separately:
 
 The file was checked with `cat person.yaml` to verify that the structure is clean and contains spaces instead of tabs.
 
+[1-2-person.yaml](YAML/1-2-person.yaml)
+
 ## Task 2 – Lists
 
 YAML supports lists in two common ways:

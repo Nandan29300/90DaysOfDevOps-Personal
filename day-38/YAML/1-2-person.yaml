@@ -1,0 +1,13 @@
+name: Nandan
+role: Software Developer
+experience_years: 2
+learning: true
+
+tools:
+  - Docker
+  - Kubernetes
+  - Git
+  - GitHub Actions
+  - Jenkins
+
+hobbies: [coding, reading, cricket]

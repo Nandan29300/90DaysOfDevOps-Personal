@@ -1,0 +1,107 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="CI/CD Workflow" id="reKvOhebMkXGPWZNBTfI">
+    <mxGraphModel dx="3228" dy="1856" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" background="light-dark(#FFFFFF,#FFFFFF)" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="RuOcu-2S9gouNykaOHZn-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#182E3E;strokeColor=#FFFFFF;fontSize=16;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0));&quot;&gt;Developer&lt;/span&gt;" vertex="1">
+          <mxGeometry height="60" width="180" x="66" y="-264" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-63" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#000000);flowAnimation=1;shadow=1;" target="RuOcu-2S9gouNykaOHZn-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#F9F7ED,#FFFFFF);strokeColor=#FFFFFF;fontSize=14;labelBackgroundColor=none;fontColor=#FFFFFF;" value="git push" vertex="1">
+          <mxGeometry height="50" width="130" x="91" y="-164" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-64" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;strokeColor=light-dark(#000000,#000000);flowAnimation=1;shadow=1;" target="RuOcu-2S9gouNykaOHZn-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#182E3E;strokeColor=#FFFFFF;fontSize=16;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="GitHub Repository" vertex="1">
+          <mxGeometry height="70" width="240" x="36" y="-74" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#F9F7ED,#FFFFFF);strokeColor=#FFFFFF;fontSize=14;labelBackgroundColor=none;fontColor=#FFFFFF;" value="Workflow Trigger" vertex="1">
+          <mxGeometry height="50" width="180" x="66" y="36" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-65" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#000000);flowAnimation=1;shadow=1;" target="RuOcu-2S9gouNykaOHZn-6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="156" y="241.12" />
+              <mxPoint x="156" y="241.12" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#182E3E;strokeColor=#FFFFFF;fontSize=15;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="Stage 1: Test&#xa;&#xa;Run Unit / Integration Tests" vertex="1">
+          <mxGeometry height="90" width="280" x="16" y="126" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-71" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#000000);flowAnimation=1;shadow=1;" target="RuOcu-2S9gouNykaOHZn-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-6" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=light-dark(#00FF00,#33FF33);strokeColor=#FFFFFF;fontSize=14;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="Tests Pass?" vertex="1">
+          <mxGeometry height="90" width="150" x="81" y="266" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF3333;strokeColor=#FFFFFF;fontSize=14;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="TEST FAILURE&#xa;STOP PIPELINE" vertex="1">
+          <mxGeometry height="65" width="200" x="-194" y="281" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-72" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#000000);flowAnimation=1;shadow=1;" target="RuOcu-2S9gouNykaOHZn-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#182E3E;strokeColor=#FFFFFF;fontSize=15;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="Stage 2: Build&#xa;&#xa;Build Docker Image" vertex="1">
+          <mxGeometry height="90" width="280" x="16" y="406" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-74" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#000000);flowAnimation=1;shadow=1;" target="RuOcu-2S9gouNykaOHZn-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-9" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=light-dark(#182E3E,#00FF00);strokeColor=#FFFFFF;fontSize=14;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="Build Success?" vertex="1">
+          <mxGeometry height="90" width="150" x="81" y="546" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF3333;strokeColor=#FFFFFF;fontSize=14;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="BUILD FAILURE&#xa;STOP PIPELINE" vertex="1">
+          <mxGeometry height="65" width="200" x="-194" y="561" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-75" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#000000);flowAnimation=1;shadow=1;" target="RuOcu-2S9gouNykaOHZn-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#F9F7ED,#FFFFFF);strokeColor=#FFFFFF;fontSize=14;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="Docker Image&#xa;&#xa;Built Successfully" vertex="1">
+          <mxGeometry height="70" width="220" x="46" y="686" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-76" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#000000);flowAnimation=1;shadow=1;" target="RuOcu-2S9gouNykaOHZn-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#182E3E;strokeColor=#FFFFFF;fontSize=15;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="Stage 3: Deploy&#xa;&#xa;Deploy to Staging" vertex="1">
+          <mxGeometry height="90" width="280" x="16" y="806" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-80" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#000000);shadow=1;flowAnimation=1;" target="RuOcu-2S9gouNykaOHZn-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-13" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=light-dark(#182E3E,#33FF33);strokeColor=#FFFFFF;fontSize=14;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="Deploy Success?" vertex="1">
+          <mxGeometry height="90" width="150" x="81" y="946" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#182E3E,#FF6666);strokeColor=#FFFFFF;fontSize=14;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="DEPLOY FAILURE&#xa;STOP / ALERT" vertex="1">
+          <mxGeometry height="65" width="200" x="-194" y="961" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#182E3E;strokeColor=#FFFFFF;fontSize=16;fontStyle=1;labelBackgroundColor=none;fontColor=#FFFFFF;" value="Staging Server&#xa;&#xa;Application Running" vertex="1">
+          <mxGeometry height="80" width="260" x="26" y="1086" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-16" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;labelBackgroundColor=none;fontColor=default;flowAnimation=1;strokeWidth=1;startSize=6;curved=0;strokeColor=light-dark(#000000,#000000);shadow=1;" target="RuOcu-2S9gouNykaOHZn-2" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="156" y="-184.37" />
+              <mxPoint x="156" y="-184.37" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-19" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;labelBackgroundColor=none;strokeColor=light-dark(#000000,#000000);fontColor=default;flowAnimation=1;shadow=1;" target="RuOcu-2S9gouNykaOHZn-5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-70" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.996;entryY=0.47;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=light-dark(#000000,#000000);flowAnimation=1;shadow=1;" target="RuOcu-2S9gouNykaOHZn-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-73" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.998;entryY=0.458;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=light-dark(#000000,#000000);flowAnimation=1;shadow=1;" target="RuOcu-2S9gouNykaOHZn-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RuOcu-2S9gouNykaOHZn-79" edge="1" parent="1" source="RuOcu-2S9gouNykaOHZn-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.994;entryY=0.467;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=light-dark(#000000,#000000);flowAnimation=1;shadow=1;" target="RuOcu-2S9gouNykaOHZn-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

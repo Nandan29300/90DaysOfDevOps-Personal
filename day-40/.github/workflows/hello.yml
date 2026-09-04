@@ -31,7 +31,8 @@ jobs:
 
       # Task 4: Print the branch that triggered the workflow
       - name: Print branch name
-        run: echo "Branch: ${{ github.ref_name }}"
+        run: |
+          echo "Branch: ${{ github.ref_name }}"
 
       # Task 4: List all files in the repository
       - name: List repository files
@@ -39,7 +40,8 @@ jobs:
 
       # Task 4: Print the runner operating system
       - name: Print runner operating system
-        run: echo "Operating system: $RUNNER_OS"
+        run: |
+          echo "Operating system: $RUNNER_OS"
 
       # ============================================================
       # TASK 5: BREAK THE PIPELINE ON PURPOSE

@@ -1,0 +1,55 @@
+# name of the workflow
+name: Hello GitHub Actions
+
+# when the workflow runs
+on:
+  push:
+
+# what work needs to be done
+jobs:
+
+  # name of the job
+  greet:
+  
+    # which runner/OS runs the job
+    runs-on: ubuntu-latest
+
+    # individual tasks in the job
+    steps:
+    
+      # Step 1: Check out the repository code
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # Step 2: Print a greeting
+      - name: Print greeting
+        run: echo "Hello from GitHub Actions!"
+
+      # Task 4: Print current date and time
+      - name: Print current date and time
+        run: date
+
+      # Task 4: Print the branch that triggered the workflow
+      - name: Print branch name
+        run: echo "Branch: ${{ github.ref_name }}"
+
+      # Task 4: List all files in the repository
+      - name: List repository files
+        run: ls -la
+
+      # Task 4: Print the runner operating system
+      - name: Print runner operating system
+        run: echo "Operating system: $RUNNER_OS"
+
+      # ============================================================
+      # TASK 5: BREAK THE PIPELINE ON PURPOSE
+      #
+      # Uncomment the following step, add, commit and push.
+      # The workflow should FAIL.
+      #
+      # - name: Intentionally fail
+      #   run: exit 1
+      #
+      # After observing the failed pipeline, comment it again
+      # and push the fix. The workflow should become GREEN.
+      # ============================================================

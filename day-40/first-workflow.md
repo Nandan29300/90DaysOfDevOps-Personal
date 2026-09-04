@@ -21,14 +21,11 @@ Starting from the Day 40 directory, the structure should look like this:
 ```text
 day-40/
 ├── README.md
-└── github-actions-practice/
-    ├── .github/
-    │   └── workflows/
-    │       └── hello.yml
-    └── day-40-first-workflow.md
+├── .github/
+      └── workflows/
+           └── hello.yml
+└── day-40-first-workflow.md
 ```
-
-> If `day-40-first-workflow.md` is kept in the repository itself, use the structure above. This file is the documentation required for the challenge.
 
 ### Create the repository and clone it
 
@@ -37,22 +34,6 @@ On GitHub, create a new public repository named:
 ```text
 github-actions-practice
 ```
-
-Then locally:
-
-```bash
-cd ~/path/to/90DaysOfDevOps-Personal/day-40
-
-git clone https://github.com/<YOUR_USERNAME>/github-actions-practice.git
-
-cd github-actions-practice
-
-mkdir -p .github/workflows
-
-touch .github/workflows/hello.yml
-```
-
-Replace `<YOUR_USERNAME>` with the GitHub username.
 
 ---
 
@@ -554,11 +535,4 @@ I learned:
 - Every push can automatically trigger a workflow.
 - A non-zero exit code can make a workflow fail.
 - The Actions UI provides logs for debugging failed steps.
-- 
----
-
-```markdown
-![Day 40 - Green GitHub Actions Run](./day-40-green-run.png)
-```
-
 ---

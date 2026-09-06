@@ -1,0 +1,41 @@
+name: Manual Environment Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Enter the environment name"
+        required: true
+        type: string
+
+jobs:
+  manual-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print environment
+        run: echo "Selected environment: ${{ inputs.environment }}"
+
+
+
+# name: Manual Trigger Workflow (take environment value from user)
+
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       environment:
+#         description: 'Select the environment'
+#         required: true
+#         default: 'staging'
+#         type: choice
+#         options:
+#           - staging
+#           - production
+
+# jobs:
+#   print-env:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Print selected environment
+#         run: |
+#          echo "Selected environment: ${{ github.event.inputs.environment }}"

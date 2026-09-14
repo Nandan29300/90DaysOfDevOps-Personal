@@ -1,0 +1,26 @@
+name: Self-Hosted Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  self-hosted-job:
+    runs-on: self-hosted
+
+    steps:
+      - name: Print machine details
+        run: |
+          echo "Hostname: $(hostname)"
+          echo "Working directory: $(pwd)"
+          echo "Current user: $(whoami)"
+
+      - name: Create a file
+        run: |
+          mkdir -p runner-output
+          echo "Created by GitHub Actions on $(date)" > runner-output/day-42.txt
+          ls -l runner-output/day-42.txt
+
+      - name: Verify the file
+        run: |
+          test -f runner-output/day-42.txt
+          echo "File exists successfully"

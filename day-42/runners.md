@@ -64,6 +64,12 @@ jobs:
 
 ![Task 1](images/task1.png)
 
+![Task 1.1](images/task1.1.png)
+
+![Task 1.2](images/task1.2.png)
+
+![Task 1.3](images/task1.3.png)
+
 ---
 
 ### Task 2: Explore What's Pre-installed
@@ -163,7 +169,11 @@ sudo ./svc.sh status
 
 **Screenshot:**
 
-![Self-hosted runner](images/selfhosted.png)
+![Task 3](images/task3.png)
+
+![Task 3.1](images/task3.1.png)
+
+![Task 3.2](images/task3.2.png)
 
 ---
 
@@ -223,6 +233,8 @@ File exists successfully
 
 ![Task 4](images/task4.png)
 
+![Task 4.1](images/task4.1.png)
+
 ---
 
 ### Task 5: Labels
@@ -259,9 +271,9 @@ jobs:
 
 **Screenshot:**
 
-![Labels](images/label.png)
-
 ![Task 5](images/task5.png)
+
+![Task 5.1](images/task5.1.png)
 
 ---
 

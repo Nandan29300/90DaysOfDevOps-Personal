@@ -1,0 +1,14 @@
+name: Self-Hosted Runner With Label
+
+on:
+  workflow_dispatch:
+
+jobs:
+  labeled-job:
+    runs-on: [self-hosted, my-linux-runner]
+
+    steps:
+      - name: Verify labeled runner
+        run: |
+          echo "Hostname: $(hostname)"
+          echo "Runner selected successfully"

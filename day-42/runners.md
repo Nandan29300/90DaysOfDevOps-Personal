@@ -314,22 +314,6 @@ Labels help GitHub choose the correct self-hosted runner. The default labels com
 
 ---
 
-## Screenshots
-
-Replace the image paths below with your actual screenshots:
-
-- `images/task1.png`
-- `images/ubuntu.png`
-- `images/windows.png`
-- `images/macos.png`
-- `images/task2.png`
-- `images/selfhosted.png`
-- `images/task4.png`
-- `images/label.png`
-- `images/task5.png`
-
----
-
 ## Conclusion
 
 In Day 42, I learned that every GitHub Actions job needs a runner. GitHub-hosted runners are managed by GitHub and are easy to use, while self-hosted runners are managed by the user or organization and provide more control over hardware, software, networking, and security.

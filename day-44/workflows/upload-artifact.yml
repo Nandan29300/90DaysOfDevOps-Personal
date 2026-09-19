@@ -1,0 +1,28 @@
+name: Day 44 - Upload Artifact
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload-artifact:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate test report
+        run: |
+          mkdir -p reports
+
+          echo "Day 44 - CI Test Report" > reports/test-report.txt
+          echo "Workflow: $GITHUB_WORKFLOW" >> reports/test-report.txt
+          echo "Run ID: $GITHUB_RUN_ID" >> reports/test-report.txt
+          echo "Status: Test report generated successfully" >> reports/test-report.txt
+
+      - name: Display test report
+        run: |
+          cat reports/test-report.txt
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: day-44-test-report
+          path: reports/test-report.txt

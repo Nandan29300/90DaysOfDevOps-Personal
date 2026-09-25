@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050816">
+  <meta name="description" content="A modern Docker CI/CD pipeline demo powered by GitHub Actions.">
+  <title>DockerFlow — CI/CD Pipeline</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg: #050816;
+      --panel: rgba(12, 18, 38, 0.72);
+      --border: rgba(255,255,255,.10);
+      --text: #f5f7ff;
+      --muted: #8e9ab7;
+      --cyan: #22d3ee;
+      --blue: #60a5fa;
+      --purple: #a78bfa;
+      --green: #34d399;
+      --orange: #fb923c;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(34,211,238,.12), transparent 28%),
+        radial-gradient(circle at 85% 20%, rgba(167,139,250,.14), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(96,165,250,.10), transparent 32%),
+        var(--bg);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .18;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, black, transparent 80%);
+    }
+
+    .orb {
+      position: fixed;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: .14;
+      pointer-events: none;
+      animation: float 12s ease-in-out infinite;
+    }
+
+    .orb.one { background: var(--cyan); left: -120px; top: 35%; }
+    .orb.two { background: var(--purple); right: -120px; top: 10%; animation-delay: -5s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(0,-35px,0) scale(1.08); }
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 32px));
+      margin: auto;
+      padding: 70px 0 55px;
+      position: relative;
+    }
+
+    .hero {
+      text-align: center;
+      animation: reveal .8s ease both;
+    }
+
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 13px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,.045);
+      color: #cbd5e1;
+      font-size: 13px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      backdrop-filter: blur(12px);
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(52,211,153,.7);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      70% { box-shadow: 0 0 0 9px rgba(52,211,153,0); }
+      100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+    }
+
+    h1 {
+      margin: 24px auto 14px;
+      max-width: 900px;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: .98;
+      letter-spacing: -.055em;
+      background: linear-gradient(100deg, #fff 10%, #9eeaf4 45%, #b9a5ff 90%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      max-width: 700px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 19px);
+      line-height: 1.7;
+    }
+
+    .status {
+      display: inline-flex;
+      margin-top: 25px;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(52,211,153,.2);
+      background: rgba(52,211,153,.06);
+      color: #a7f3d0;
+      font-size: 13px;
+    }
+
+    .pipeline-shell {
+      margin-top: 58px;
+      padding: 25px;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+      box-shadow: 0 30px 80px rgba(0,0,0,.35);
+      backdrop-filter: blur(18px);
+      animation: reveal .9s .15s ease both;
+    }
+
+    .pipeline-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 24px;
+    }
+
+    .pipeline-head strong { font-size: 15px; }
+    .pipeline-head span { color: var(--muted); font-size: 12px; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .node {
+      position: relative;
+      min-height: 180px;
+      padding: 23px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: rgba(3,7,18,.62);
+      overflow: hidden;
+      transition: transform .3s ease, border-color .3s ease;
+    }
+
+    .node:hover {
+      transform: translateY(-7px);
+      border-color: rgba(255,255,255,.25);
+    }
+
+    .node::before {
+      content: "";
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      right: -55px;
+      top: -60px;
+      border-radius: 50%;
+      background: var(--accent);
+      filter: blur(45px);
+      opacity: .22;
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      font-size: 23px;
+      background: color-mix(in srgb, var(--accent) 13%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+      position: relative;
+    }
+
+    .node h2 {
+      margin: 18px 0 7px;
+      font-size: 19px;
+    }
+
+    .node p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .node small {
+      display: inline-block;
+      margin-top: 17px;
+      color: var(--accent);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+    }
+
+    .connector {
+      position: absolute;
+      top: 50%;
+      right: -22px;
+      width: 30px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), transparent);
+      z-index: 3;
+    }
+
+    .connector::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: -4px;
+      width: 8px;
+      height: 8px;
+      border-top: 2px solid var(--cyan);
+      border-right: 2px solid var(--cyan);
+      transform: rotate(45deg);
+    }
+
+    .packet {
+      position: absolute;
+      top: -3px;
+      left: 0;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 12px var(--cyan), 0 0 24px var(--cyan);
+      animation: travel 2.2s linear infinite;
+    }
+
+    @keyframes travel {
+      from { left: 0; opacity: 0; }
+      12% { opacity: 1; }
+      88% { opacity: 1; }
+      to { left: 100%; opacity: 0; }
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .card {
+      padding: 25px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+    }
+
+    .card h3 { margin: 0 0 17px; font-size: 15px; }
+
+    .terminal {
+      color: #b8c5df;
+      font: 13px/1.9 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .terminal .prompt { color: var(--green); }
+    .terminal .cmd { color: #e2e8f0; }
+    .terminal .accent { color: var(--cyan); }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .tag {
+      padding: 8px 11px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: #cbd5e1;
+      background: rgba(255,255,255,.035);
+      font-size: 12px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      color: #66728d;
+      font-size: 12px;
+    }
+
+    @media (max-width: 850px) {
+      .flow { grid-template-columns: 1fr 1fr; }
+      .connector { display: none; }
+      .meta { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 520px) {
+      .wrap { padding-top: 45px; }
+      .flow { grid-template-columns: 1fr; }
+      .pipeline-shell { padding: 15px; }
+      .pipeline-head { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow"><span class="pulse"></span> CI/CD pipeline online</div>
+      <h1>Ship code.<br>Not containers manually.</h1>
+      <p class="subtitle">
+        A modern Docker delivery pipeline where GitHub Actions builds the image,
+        publishes it to Docker Hub, and makes it ready to run anywhere.
+      </p>
+      <div class="status">● Automated delivery · Day 45 / 90 Days of DevOps</div>
+    </section>
+
+    <section class="pipeline-shell">
+      <div class="pipeline-head">
+        <strong>LIVE DELIVERY PIPELINE</strong>
+        <span>git push → production-ready image</span>
+      </div>
+
+      <div class="flow">
+        <article class="node" style="--accent: #60a5fa">
+          <div class="icon">⌘</div>
+          <h2>Git Push</h2>
+          <p>Source code lands in the GitHub repository and triggers the workflow.</p>
+          <small>github.com</small>
+          <div class="connector"><span class="packet"></span></div>
+        </article>
+
+        <article class="node" style="--accent: #a78bfa">
+          <div class="icon">⚙</div>
+          <h2>Build</h2>
+          <p>GitHub-hosted runner builds an immutable image from the Dockerfile.</p>
+          <small>docker build</small>
+          <div class="connector"><span class="packet"></span></div>
+        </article>
+
+        <article class="node" style="--accent: #22d3ee">
+          <div class="icon">🐳</div>
+          <h2>Docker Hub</h2>
+          <p>Successful main-branch builds are tagged and pushed to the registry.</p>
+          <small>latest · sha-xxxxxxx</small>
+          <div class="connector"><span class="packet"></span></div>
+        </article>
+
+        <article class="node" style="--accent: #34d399">
+          <div class="icon">🚀</div>
+          <h2>Run Anywhere</h2>
+          <p>Pull the image on a server or laptop and start the application.</p>
+          <small>docker run</small>
+        </article>
+      </div>
+    </section>
+
+    <section class="meta">
+      <div class="card">
+        <h3>Deployment command</h3>
+        <div class="terminal">
+          <div><span class="prompt">$</span> <span class="cmd">docker pull</span> <span class="accent">USER/webapp:latest</span></div>
+          <div><span class="prompt">$</span> <span class="cmd">docker run -d -p</span> <span class="accent">8080:80 USER/webapp:latest</span></div>
+          <div><span class="prompt">$</span> <span class="cmd">curl</span> <span class="accent">localhost:8080</span></div>
+          <div>✓ container is running</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Stack</h3>
+        <div class="tags">
+          <span class="tag">Docker</span>
+          <span class="tag">Nginx</span>
+          <span class="tag">GitHub Actions</span>
+          <span class="tag">Docker Hub</span>
+          <span class="tag">CI/CD</span>
+          <span class="tag">Linux</span>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Built as part of <strong>#90DaysOfDevOps</strong> · Day 45 · Automated Docker delivery
+    </footer>
+  </main>
+</body>
+</html>

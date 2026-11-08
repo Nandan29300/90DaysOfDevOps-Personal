@@ -42,7 +42,7 @@ Create `.github/workflows/reusable-build.yml`:
 
 ![Task 2 Screenshot](images/task2.png)
 
-[Reusable Workflow](workflows/reusable-build.yml)
+[Reusable Workflow](.github/workflows/reusable-build.yml)
 
 ---
 
@@ -72,7 +72,7 @@ jobs:
 
 ![Task 3 Screenshot](images/task3.png)
 
-[Caller Workflow](workflows/call-build.yml)
+[Caller Workflow](.github/workflows/call-build.yml)
 
 ---
 
@@ -92,7 +92,7 @@ Extend `reusable-build.yml`:
 
 ![Task 4 Screenshot](images/task4.png)
 
-[Reusable Workflow](workflows/reusable-build.yml)
+[Reusable Workflow](.github/workflows/reusable-build.yml)
 
 ---
 
@@ -113,9 +113,9 @@ Create a **custom composite action** in your repo at `.github/actions/setup-and-
 
 ![Task 5 Screenshot](images/task5.png)
 
-[Composite Action](workflows/action.yml)
+[Composite Action](.github/workflows/action.yml)
 
-[Greeting Workflow](workflows/greet.yml)
+[Greeting Workflow](.github/workflows/greet.yml)
 
 ---
 

@@ -229,7 +229,7 @@ See the workflow files in `.github/workflows/` for the implementation.
 
 ## Docker Hub Image
 
-Docker Hub repository: `https://hub.docker.com/r/nandan56/YOUR_IMAGE_NAME`
+Docker Hub repository: `https://hub.docker.com/r/nandan56/github-actions-capstone`
 
 Replace the placeholder with the actual repository URL after publishing the image.
 

@@ -30,27 +30,6 @@ The pipeline uses reusable workflows to build and test a Node.js application, bu
 3. Add a `Dockerfile` and a basic test for the application.
 4. Add a `README.md` describing the project.
 
-**Project structure:**
-
-```text
-github-actions-capstone/
-├── .github/
-│   └── workflows/
-│       ├── reusable-build-test.yml
-│       ├── reusable-docker.yml
-│       ├── pr-pipeline.yml
-│       ├── main-pipeline.yml
-│       └── health-check.yml
-├── images/
-│   ├── task4.png
-│   ├── task5.png
-│   ├── task6.png
-│   ├── badges.png
-│   └── trivy-artifact.png
-├── app.js
-├── package.json
-├── Dockerfile
-└── README.md
 ```
 
 ### Task 2: Reusable Workflow — Build & Test

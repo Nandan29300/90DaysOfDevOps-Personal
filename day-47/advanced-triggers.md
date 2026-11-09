@@ -18,8 +18,11 @@ The workflow prints the event action, PR title, author, source branch, and targe
 **Screenshots**
 
  ![PR Opened](images/pr-opened.png)
+ 
  ![PR updated](images/pr-update.png)
+ 
  ![PR reopened](images/pr-reopened.png)
+ 
  ![PR merged](images/pr-merged-closed.png)
 
 Workflow: [PR Lifecycle](.github/workflows/pr-lifecycle.yml)
@@ -40,7 +43,7 @@ It contains three independent jobs:
 
 **Screenshot**
 
-- ![PR checks](images/task2.png)
+![PR checks](images/task2.png)
 
 Workflow: [PR Checks](.github/workflows/pr-checks.yml)
 
@@ -70,7 +73,7 @@ The workflow prints the cron expression that triggered it using `github.event.sc
 
 **Screenshot** 
 
-- ![Scheduled workflow](images/task3.png)
+![Scheduled workflow](images/task3.png)
 
 Workflow: [Scheduled Tasks](.github/workflows/scheduled-tasks.yml)
 
@@ -93,8 +96,9 @@ Created two workflows to understand path and branch filtering.
 
 **Screenshots**
 
-- ![Smart trigger](images/task4-1.png)
-- ![Docs-only change skipped](images/task4-2.png)
+![Smart trigger](images/task4-1.png)
+
+![Docs-only change skipped](images/task4-2.png)
 
 Workflows: [Smart Triggers](.github/workflows/smart-triggers.yml) | [Ignore Docs](.github/workflows/ignore-docs.yml)
 
@@ -118,8 +122,9 @@ The downstream workflow checks `github.event.workflow_run.conclusion`:
 
 **Screenshot** 
 
-- ![Workflow run chain](images/task5.png)
-- ![Workflow run chain](images/task5-1.png)
+![Workflow run chain](images/task5.png)
+ 
+![Workflow run chain](images/task5-1.png)
 
 Workflows: [Run Tests](.github/workflows/tests.yml) | [Deploy After Tests](.github/workflows/deploy-after-tests.yml)
 
@@ -157,7 +162,7 @@ The authenticated GitHub user/token needs permission to dispatch events to the r
 
 **Screenshot**
 
-- ![Repository dispatch](images/task6.png)
+![Repository dispatch](images/task6.png)
 
 Workflow: [External Trigger](.github/workflows/external-trigger.yml)
 

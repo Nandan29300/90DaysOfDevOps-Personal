@@ -17,10 +17,10 @@ The workflow prints the event action, PR title, author, source branch, and targe
 
 **Screenshots**
 
-- ![PR Opened](images/pr-opened.png)
-- ![PR updated](images/pr-update.png)
-- ![PR reopened](images/pr-reopened.png)
-- ![PR merged](images/pr-merged-closed.png)
+ ![PR Opened](images/pr-opened.png)
+ ![PR updated](images/pr-update.png)
+ ![PR reopened](images/pr-reopened.png)
+ ![PR merged](images/pr-merged-closed.png)
 
 Workflow: [PR Lifecycle](.github/workflows/pr-lifecycle.yml)
 

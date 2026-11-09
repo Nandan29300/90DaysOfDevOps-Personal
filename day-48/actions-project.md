@@ -184,7 +184,20 @@ Check Health Endpoint
 Write Job Summary & Clean Up
 ```
 
-![Workflow badges](images/badges.png)
+<p align="center">
+  <a href="https://github.com/agiledevopsguru/github-actions-capstone/actions/workflows/main-pipeline.yml">
+    <img src="https://github.com/agiledevopsguru/github-actions-capstone/actions/workflows/main-pipeline.yml/badge.svg" alt="Main Pipeline Status">
+  </a>
+  <a href="https://github.com/agiledevopsguru/github-actions-capstone/actions/workflows/pr-pipeline.yml">
+    <img src="https://github.com/agiledevopsguru/github-actions-capstone/actions/workflows/pr-pipeline.yml/badge.svg" alt="PR Pipeline Status">
+  </a>
+  <a href="https://github.com/agiledevopsguru/github-actions-capstone/actions/workflows/health-check.yml">
+    <img src="https://github.com/agiledevopsguru/github-actions-capstone/actions/workflows/health-check.yml/badge.svg" alt="Health Check Status">
+  </a>
+  <a href="https://hub.docker.com/r/nandan56/github-actions-capstone">
+    <img src="https://img.shields.io/docker/pulls/nandan56/github-actions-capstone.svg" alt="Docker Pulls">
+  </a>
+</p>
 
 ---
 

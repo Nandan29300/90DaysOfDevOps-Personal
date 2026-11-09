@@ -30,7 +30,6 @@ The pipeline uses reusable workflows to build and test a Node.js application, bu
 3. Add a `Dockerfile` and a basic test for the application.
 4. Add a `README.md` describing the project.
 
-```
 
 ### Task 2: Reusable Workflow — Build & Test
 
@@ -46,6 +45,7 @@ Create `.github/workflows/reusable-build-test.yml`.
 
 This workflow is responsible only for building and testing. It does not deploy or publish Docker images.
 
+
 ### Task 3: Reusable Workflow — Docker Build & Push
 
 Create `.github/workflows/reusable-docker.yml`.
@@ -58,6 +58,7 @@ Create `.github/workflows/reusable-docker.yml`.
 6. Expose the full image path through the `image_url` output.
 
 The `tag` input in the example workflow accepts comma-separated tags, allowing the caller to publish both `latest` and a commit-specific tag in one build.
+
 
 ### Task 4: PR Pipeline
 
@@ -72,6 +73,7 @@ Create `.github/workflows/pr-pipeline.yml`.
 **Verify:** Open a pull request targeting `main` and confirm that the test workflow runs without publishing a Docker image.
 
 ![PR pipeline test run](images/task4.png)
+
 
 ### Task 5: Main Branch Pipeline
 
@@ -89,6 +91,7 @@ Create `.github/workflows/main-pipeline.yml`.
 
 ![Main branch pipeline run](images/task5.png)
 
+
 ### Task 6: Scheduled Health Check
 
 Create `.github/workflows/health-check.yml`.
@@ -103,6 +106,7 @@ Create `.github/workflows/health-check.yml`.
 8. Write a health-check report to `$GITHUB_STEP_SUMMARY`.
 
 ![Scheduled health check run](images/task6.png)
+
 
 ### Task 7: Add Badges & Documentation
 

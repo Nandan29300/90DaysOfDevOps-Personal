@@ -1,0 +1,63 @@
+
+name: Scheduled Health Check
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Pull latest Docker image
+        env:
+          IMAGE: YOUR_DOCKERHUB_USERNAME/YOUR_IMAGE_NAME:latest
+        run: docker pull "$IMAGE"
+
+      - name: Start container
+        env:
+          IMAGE: YOUR_DOCKERHUB_USERNAME/YOUR_IMAGE_NAME:latest
+        run: |
+          docker run -d \
+            --name health-app \
+            -p 3000:3000 \
+            "$IMAGE"
+
+      - name: Check application health
+        id: health
+        run: |
+          sleep 5
+
+          if curl --fail http://localhost:3000/health; then
+            echo "status=PASSED" >> "$GITHUB_OUTPUT"
+            echo "Health check passed!"
+          else
+            echo "status=FAILED" >> "$GITHUB_OUTPUT"
+            echo "Health check failed!"
+            exit 1
+          fi
+
+      - name: Create health check summary
+        if: always()
+        env:
+          STATUS: ${{ steps.health.outputs.status }}
+        run: |
+          echo "## Health Check Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Image: YOUR_IMAGE_NAME:latest" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Status: ${STATUS:-NOT COMPLETED}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Time: $(date)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Stop and remove container
+        if: always()
+        run: |
+          docker stop health-app || true
+          docker rm health-app || true

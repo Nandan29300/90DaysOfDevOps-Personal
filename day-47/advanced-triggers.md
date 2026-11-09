@@ -127,11 +127,17 @@ The workflow prints the environment passed in `client_payload`, for example `pro
 Trigger it from a terminal with GitHub CLI (replace the owner and repository):
 
 ```bash
-gh api repos/<OWNER>/<REPO>/dispatches \
+gh api repos/agiledevopsguru/github-actions-practice/dispatches \
   --method POST \
   -H "Accept: application/vnd.github+json" \
-  -f event_type=deploy-request \
-  -F client_payload='{"environment":"production"}'
+  --input - <<'EOF'
+{
+  "event_type": "deploy-request",
+  "client_payload": {
+    "environment": "production"
+  }
+}
+EOF
 ```
 
 The authenticated GitHub user/token needs permission to dispatch events to the repository. For a fine-grained token, grant the appropriate repository permission to write repository contents/dispatch events as required by GitHub; a classic token commonly uses the `repo` scope for a private repository.

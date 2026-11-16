@@ -1,0 +1,46 @@
+
+name: PR Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  build-test:
+    uses: ./.github/workflows/reusable-build-test.yml
+    with:
+      node_version: '22'
+      run_tests: true
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: critical
+
+  pr-comment:
+    name: PR Checks Summary
+    runs-on: ubuntu-latest
+    needs:
+      - build-test
+      - dependency-review
+
+    steps:
+      - name: PR Checks Summary
+        run: |
+          echo "PR checks passed for branch: ${{ github.head_ref }}"
+          echo "Build, tests and dependency review completed successfully."

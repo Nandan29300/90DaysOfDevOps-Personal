@@ -22,12 +22,12 @@ jobs:
 
       - name: Pull latest Docker image
         env:
-          IMAGE: YOUR_DOCKERHUB_USERNAME/YOUR_IMAGE_NAME:latest
+          IMAGE: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPOSITORY }}:latest
         run: docker pull "$IMAGE"
 
       - name: Start container
         env:
-          IMAGE: YOUR_DOCKERHUB_USERNAME/YOUR_IMAGE_NAME:latest
+          IMAGE: IMAGE: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPOSITORY }}:latest
         run: |
           docker run -d \
             --name health-app \

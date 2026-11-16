@@ -20,7 +20,7 @@ jobs:
     needs: build-test
     uses: ./.github/workflows/reusable-docker.yml
     with:
-      image_name: YOUR_DOCKERHUB_USERNAME/YOUR_IMAGE_NAME
+      image_name: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPOSITORY }}
       tag: latest
     secrets:
       docker_username: ${{ secrets.DOCKER_USERNAME }}

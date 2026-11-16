@@ -1,4 +1,4 @@
-# Day 49 – DevSecOps: Add Security to Your CI/CD Pipeline
+# Day 49 - DevSecOps: Add Security to Your CI/CD Pipeline
 
 ## Project
 **Repository:** `github-actions-capstone`  
@@ -19,7 +19,7 @@ DevSecOps means building security checks into the software development and deliv
 
 ---
 
-## 3. Task 1 – Scan the Docker image with Trivy
+## 3. Task 1 - Scan the Docker image with Trivy
 
 Trivy scans the built container image for known vulnerabilities (CVEs). The pipeline should run the scan **after the image is built but before it is pushed or deployed**.
 
@@ -49,7 +49,7 @@ Use the `CRITICAL,HIGH` severity threshold for this task. Do not use `ignore-unf
 
 ---
 
-## 4. Task 2 – Enable GitHub Secret Scanning and Push Protection
+## 4. Task 2 - Enable GitHub Secret Scanning and Push Protection
 
 Secret scanning helps detect credentials such as API keys, access tokens, and passwords that may have been committed to a repository.
 
@@ -82,7 +82,7 @@ Enable these options if available:
 
 ---
 
-## 5. Task 3 – Review dependency changes in pull requests
+## 5. Task 3 - Review dependency changes in pull requests
 
 The Dependency Review Action checks dependency changes introduced by a pull request against known vulnerability information. It helps identify risky dependency updates before they are merged.
 
@@ -111,7 +111,7 @@ Add this step to the pull-request workflow:
 
 ---
 
-## 6. Task 4 – Apply least-privilege workflow permissions
+## 6. Task 4 - Apply least-privilege workflow permissions
 
 Workflow permissions control what the GitHub Actions `GITHUB_TOKEN` can do. Granting only the permissions required by a workflow reduces the damage that a compromised action or job could cause.
 
@@ -135,49 +135,40 @@ If a compromised action has unnecessary write access, it could potentially modif
 
 ---
 
-## 7. Updated secure CI/CD pipeline
+### 7. Task 5 - Updated secure CI/CD pipeline 
 
-```text
-Pull request opened
-        |
-        v
-Build and test
-        |
-        v
-Dependency review
-        |
-        v
-PR checks pass or fail
-        |
-        v
+Look at what your pipeline does now:
+
+```
+PR opened
+  → build & test
+  → dependency vulnerability check     ← NEW (Day 49)
+  → PR checks pass or fail
+
 Merge to main
-        |
-        v
-Build and test
-        |
-        v
-Build Docker image (do not push yet)
-        |
-        v
-Trivy image scan (CRITICAL,HIGH)
-        |
-        +---- Scan fails ----> Stop pipeline; do not push/deploy
-        |
-        v
-Scan passes
-        |
-        v
-Push Docker image
-        |
-        v
-Deploy
+  → build & test
+  → Docker build
+  → Trivy image scan (fail on CRITICAL) ← NEW (Day 49)
+  → Docker push (only if scan passes)
+  → deploy
 
-Always active:
-  GitHub secret scanning
-  Push protection (if available)
+Always active
+  → GitHub secret scanning              ← NEW (Day 49)
+  → push protection for secrets         ← NEW (Day 49)
 ```
 
-This project adds security checks to the CI/CD process: dependency review on pull requests, container scanning before pushing, repository secret protection, and restricted workflow permissions.
+Draw this diagram in your notes. You just built a **DevSecOps pipeline** — security is now part of your automation, not an afterthought.
+
+  ![image](images/devsecops.png)
+
+---
+
+Secret scanning detects sensitive data (like API keys or passwords) accidentally committed to code, preventing leaks.
+
+Dependency review analyzes project libraries to catch vulnerabilities, outdated packages, or risky changes before they’re merged.
+
+
+DevSecOps means including security in every step of making and running software. Developers, security teams, and operations work together to find and fix security problems early. This helps create safer software faster.
 
 ---
 
